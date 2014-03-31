@@ -23,8 +23,6 @@ public class MainWindow extends JPanel {
 	private static JScrollPane sp ;
 	static int windowColor = 0xE6E6FA;
 
-	
-	//alright let's try this again
 	public static JMenuBar createMenuBar()
 	{
 		JMenuBar menuBarUpper = new JMenuBar();		//define and initialized menuBarUpper
@@ -38,7 +36,7 @@ public class MainWindow extends JPanel {
 		menuBarUpper.add(HelpMenu);							//add "help" menu to the bar
 
 		JMenuItem newItem = new JMenuItem("New");
-//		newItem.setAccelerator(KeyStroke.getKeyStroke('N', KeyEvent.CTRL_DOWN_MASK));
+		newItem.setAccelerator(KeyStroke.getKeyStroke('N', KeyEvent.CTRL_DOWN_MASK));
 		
 		JMenuItem openItem = new JMenuItem("Open");					//create the open
 		openItem.setAccelerator(KeyStroke.getKeyStroke('O', KeyEvent.CTRL_DOWN_MASK));
