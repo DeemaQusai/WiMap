@@ -23,7 +23,6 @@ public class MainWindow extends JPanel {
 	private static JScrollPane sp ;
 	static int windowColor = 0xE6E6FA;
 
-//bo
 	public static JMenuBar createMenuBar()
 	{
 		JMenuBar menuBarUpper = new JMenuBar();		//define and initialized menuBarUpper
