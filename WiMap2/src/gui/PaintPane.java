@@ -15,6 +15,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -26,22 +30,24 @@ import javax.swing.Timer;
 
 import soft.getRSSI;
 import soft.sample;
- 
+import soft.MAC_samples;
+
 public class PaintPane extends JComponent {
- 
+
 	private static final long serialVersionUID = 1L;
 	static ArrayList<sample> mySamples = null;
 	static ArrayList<JLabel> myLabels = null;
+	static ArrayList <MAC_samples> Mac = new ArrayList<MAC_samples>();
 	private File file = new File("Mysamples_result.csv");
 	private BufferedWriter Writer;
- 
+
 	private JButton undoBtn ;
 	private JButton clearBtn ;
 	private JButton NBtn;
 	private JButton apPositionBtn ;
 	private JButton smoothBtn;
 	private JTextField sampleCount ;
- 
+
 	public double mapScale ;
 	public double AP_x , AP_y;
 	public double   PLE_n =0;			//path loss exponent
@@ -49,21 +55,25 @@ public class PaintPane extends JComponent {
 	private int x1 ,y1 ;
 	private int x2 ,y2 ;
 
+	//need for saving samples
+	int i=0; // # of distinct MAC address
+	int n =0; //Counter
+
 	public boolean smoothOn = false;
- 
+
 	Timer timer ;
 	BufferedImage image = null;
 
 	MouseListener samplingML ;		// mouse listener that handles taking samples
 	MouseListener apPoML ;			// mouse listener for positioning an AP
 	MouseListener scalingML ;		// mouse listener for scaling
- 
+
 	public PaintPane ()
 	{
 		mySamples = new ArrayList<sample>();
 		myLabels = new ArrayList<JLabel>();
 		setLayout(null);
-		
+
 		samplingML = new MouseAdapter() {		//on click executes this code
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -73,18 +83,97 @@ public class PaintPane extends JComponent {
 				if (e.getX() > image.getWidth() || e.getY() > image.getHeight())	//prevents user from taking samples outside of the image
 					return;
 
-//				JOptionPane.showMessageDialog(null, "These are your coordinates ("+e.getX()+","+e.getY()+").\nClick OK and wait 5 seconds.");
+				//				JOptionPane.showMessageDialog(null, "These are your coordinates ("+e.getX()+","+e.getY()+").\nClick OK and wait 5 seconds.");
 				TimeOutOptionPane countdown_msg = new TimeOutOptionPane();
 				countdown_msg.showTimeoutDialog(MainWindow.f, "Please wait while we take samples...", "", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, new Object[] {}, null);
-				 					
-				float RSSI = GetRSSI();
-				 
-				sample s = new sample(RSSI, e.getX(), e.getY());			//change here
-//				sample s = new sample(e.getX(), e.getY());			
-				mySamples.add(s);
 
+
+				/******************************** Savaing sample for each mAC Adderss****************************/
+				String S ="";
+				String MACAdd ="";
+				float RSSI =0;
+				BufferedReader br = null;
+				String show ="";
+				ArrayList <Float> sigL= new ArrayList<Float>();
+				try {
+					br = new BufferedReader(new FileReader("result.txt")); 
+				} catch (FileNotFoundException k) {
+					// TODO Auto-generated catch block
+					k.printStackTrace();
+				}
+				try {
+					while ((S = br.readLine()) != null) {
+						//Read MAC address line
+						if(S.startsWith("Address:"))
+						{
+							MACAdd = S.substring(9);
+							if (Mac.isEmpty())
+							{
+								MAC_samples M = new MAC_samples(MACAdd);
+								Mac.add(M);
+								i++;
+							}
+							else
+							{
+								while (n<i)
+								{
+									if (MACAdd.equals(Mac.get(n).getMac()))
+										break;
+									else
+										n++;
+								}
+
+								if(n==i )
+								{
+									MAC_samples M = new MAC_samples(MACAdd);
+									Mac.add(M);
+									i++;
+								}
+							}
+						}
+						//Read RSSI
+						if(S.startsWith("RSSI"))
+						{ 
+							RSSI = Float.parseFloat(S.substring(6));
+							sample s = new sample(RSSI, e.getX(), e.getY());
+							Mac.get(n).A.add(s);
+							sigL.add(RSSI);
+							n=0;
+							MACAdd = "";
+
+
+						}
+					}
+				} catch (IOException t) {
+					// TODO Auto-generated catch block
+					t.printStackTrace();
+				}
+
+				/*for(int m =0 ; m < Mac.size() ; m++)
+				{
+					System.out.println("Mac address is:" + Mac.get(m).getMac());
+					for(int j =0; j< Mac.get(m).A.size() ;j++)
+					{ 
+						System.out.println("My elements is"+ Mac.get(m).A.get(j).getSignal()+" " + Mac.get(m).A.get(j).getX()+ " " +Mac.get(m).A.get(j).getY());
+					}
+				}*/
+
+				sample D = new sample(RSSI , e.getX(), e.getY()); // to save all samples ( not for specific MAC address)
+				mySamples.add(D);
+
+				/*******************************End saving samples*******************************************/
+
+				//float RSSI = GetRSSI();
 				JLabel tryLabel = new JLabel(Integer.toString(mySamples.size()+1));
-				tryLabel.setToolTipText(Float.toString(s.getSignal()));		
+				for(int n =0 ; n < sigL.size(); n++)
+				{
+					if (n ==0)
+						show = show  + Float.toString(sigL.get(n));
+					else
+						show = show + "," + Float.toString(sigL.get(n));
+
+				}
+				tryLabel.setToolTipText(show);	
 
 				// handles the right click on a sample (a JLabel)
 				tryLabel.addMouseListener(new MouseAdapter() {  
@@ -102,16 +191,15 @@ public class PaintPane extends JComponent {
 				tryLabel.setVisible(true);
 				myLabels.add(tryLabel);
 				add(tryLabel);
-
 				undoBtn.setEnabled(true);
 				clearBtn.setEnabled(true);
 				smoothBtn.setEnabled(true);
 				sampleCount.setText("Number of samples: " + Integer.toString(mySamples.size()));
 				repaint();
-				
+
 			}
 		};	
-		
+
 		apPoML = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -122,7 +210,7 @@ public class PaintPane extends JComponent {
 				addMouseListener(samplingML);//apPoFlag = false;
 			}
 		};
-		
+
 		scalingML = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent ev) {
@@ -145,11 +233,11 @@ public class PaintPane extends JComponent {
 				{
 					x2 = ev.getX();
 					y2 = ev.getY();
-				
+
 					// now to calculate the scale
 					pixd = distance(x2, y2, x1, y1);
 					System.out.println("click count = " + clickCount + "("+x1+","+y1+") ("+x2+","+y2+")");
-					
+
 					//prompt the user to enter the actual distance in meters
 					try {
 						String input = JOptionPane.showInputDialog(null, "Enter the Real distance (meter):", "");
@@ -159,7 +247,7 @@ public class PaintPane extends JComponent {
 					{
 						e.printStackTrace();
 					}
-//					System.out.println("pixels " + pixd + " meters : " + reald);
+					//					System.out.println("pixels " + pixd + " meters : " + reald);
 
 					if (reald / pixd > 1)		// if actual distance > pixels distance
 					{
@@ -172,7 +260,7 @@ public class PaintPane extends JComponent {
 						setScale(pixd / reald);//??
 					}
 					System.out.println("Map scale : " + mapScale);
-					
+
 					clickCount = 0;
 					removeMouseListener(scalingML);		// am done scaling
 					addMouseListener(samplingML);		// start taking samples now
@@ -184,7 +272,7 @@ public class PaintPane extends JComponent {
 		};
 
 	}// end of constructor
-	
+
 	public void initialize ()
 	{
 		setLayout(null);
@@ -192,7 +280,7 @@ public class PaintPane extends JComponent {
 		this.addMouseListener(scalingML);		// need to take scale first.
 		clear();
 	}
- 
+
 	public void yesNo(String theMessage, JLabel label) {
 		//prompt the user for confirmation to delete the sample
 		JDialog.setDefaultLookAndFeelDecorated(true);
@@ -202,7 +290,7 @@ public class PaintPane extends JComponent {
 		if (response == JOptionPane.YES_OPTION) {
 			deleteSample(label);
 		}
- 
+
 	}	
 
 	public void openImage (BufferedImage im)
@@ -212,17 +300,17 @@ public class PaintPane extends JComponent {
 		repaint();
 		apPositionBtn.setEnabled(true);
 		smoothBtn.setEnabled(true);
-		
+
 		//prompt user to scale
 		JOptionPane.showMessageDialog(null, "Must determine the map scale before taking samples.\n click on two points and enter the real distance between them in meters" );
 
 	}
- 
+
 	public void paint (Graphics g)
 	{
 		super.paintComponent(g);		//don't know what it does...
 		g.drawImage(image, 0, 0, null);		//draws the image at 0,0 every time 
- 
+
 		//System.out.println("REPAINTING");
 		//double value =0 ;
 		int value =0 ;			// how bright the red is
@@ -236,55 +324,55 @@ public class PaintPane extends JComponent {
 		{
 			//throws exception when the image = null
 		}
-		
+
 		if (smoothOn)
 		{
 			int l =  6;
 			int p = 8;
 			double d = 0;
- 
+
 			for(int x = 0; x<image_H ; x=x+l)
 			{
 				LabelHere:
-				for (int y = 0; y<image_W ; y=y+l)
-				{
-					value = 0;
-					double dx = 0 ;
-					double wj = 0 ;
-					d = 0;
-					for (int j = 0 ; j<mySamples.size() ; j++){
-						d = distance(x, y, (int)mySamples.get(j).getX(), (int)mySamples.get(j).getY());
-						if(x < mySamples.get(j).getX() && mySamples.get(j).getX() < x+l && y < mySamples.get(j).getY() && mySamples.get(j).getY() <y+l)
-						{
-							value = (int) Math.abs(mySamples.get(j).getSignal());
-						//	System.out.println("value(" + x + "," + y + ") = " + value);
-							
-							myColor = getColor (value);
-							
-							g.setColor(myColor); 
-							g.fillRect(x, y, l, l);		//
-							continue LabelHere;
-						}
-						else
-							wj = wj + 1/ (Math.pow(d, p)) ; 
-					}
-					dx = 0;
-					double wi = 0 ;
-					for(int i = 0 ; i<mySamples.size(); i++)
+					for (int y = 0; y<image_W ; y=y+l)
 					{
-						dx = distance(x, y, (int)mySamples.get(i).getX(), (int)mySamples.get(i).getY()); 
-						wi = 1 / Math.pow(dx, p) ;
-						value = (int) (value + ((wi * (Math.abs(mySamples.get(i).getSignal())))/wj));
-					}
- 
+						value = 0;
+						double dx = 0 ;
+						double wj = 0 ;
+						d = 0;
+						for (int j = 0 ; j<mySamples.size() ; j++){
+							d = distance(x, y, (int)mySamples.get(j).getX(), (int)mySamples.get(j).getY());
+							if(x < mySamples.get(j).getX() && mySamples.get(j).getX() < x+l && y < mySamples.get(j).getY() && mySamples.get(j).getY() <y+l)
+							{
+								value = (int) Math.abs(mySamples.get(j).getSignal());
+								//	System.out.println("value(" + x + "," + y + ") = " + value);
+
+								myColor = getColor (value);
+
+								g.setColor(myColor); 
+								g.fillRect(x, y, l, l);		//
+								continue LabelHere;
+							}
+							else
+								wj = wj + 1/ (Math.pow(d, p)) ; 
+						}
+						dx = 0;
+						double wi = 0 ;
+						for(int i = 0 ; i<mySamples.size(); i++)
+						{
+							dx = distance(x, y, (int)mySamples.get(i).getX(), (int)mySamples.get(i).getY()); 
+							wi = 1 / Math.pow(dx, p) ;
+							value = (int) (value + ((wi * (Math.abs(mySamples.get(i).getSignal())))/wj));
+						}
+
 						myColor = getColor (value);
 						//System.out.println("value(" + x + "," + y + ") = " + value);
 						g.setColor(myColor); 
 						g.fillRect(x, y, l, l);		//
-				}
-				//System.out.println("value(" + x + ") = " + value);
+					}
+			//System.out.println("value(" + x + ") = " + value);
 			}
- 
+
 		}
 		else {
 			for (int i=0; i<mySamples.size() ; i++)
@@ -298,34 +386,34 @@ public class PaintPane extends JComponent {
 			}					
 		}
 	}
- 
+
 	public double distance (int x2, int y2, int x1, int y1)
 	{
 		double ds = 0; 
 		double ret = 0 ;
 		ds = (Math.pow(Math.abs((x2-x1)), 2) + Math.pow(Math.abs((y2-y1)), 2)) ;
- 
+
 		ret = Math.sqrt(ds) * 100 ;
 		ret = Math.round(ret);
 		ret = ret / 100 ;
 		return ret;
 	}
- 
+
 	public Color getColor (double val)
 	{	
 		float h = 0.0f; 	//Hue value (changes to give rainbow scale)
 		float s = 0.9f;		//Saturation
 		float b = 0.9f;		//Brightness
-	
+
 		for (int i = 20; i < val; i++){
 			h+=0.006;		//increment hue with the decrease of the RSSI
 		}
 		int rgbColorCode = Color.HSBtoRGB(h, s, b);		//extract RGB color to add opacity
 		String hex_string = "88" + Integer.toHexString(rgbColorCode).substring(2);
 		Color rgb_color = new Color((int) Long.parseLong(hex_string, 16), true);
-		
+
 		//System.out.println("RSSI: " + val + " Color: " + rgb_color);
-		
+
 		return rgb_color;
 	}
 
@@ -336,7 +424,7 @@ public class PaintPane extends JComponent {
 			String unixCommand = "sh ws.sh";
 			getRSSI.runShellScript(unixCommand);
 			RSSI = getRSSI.readMyFile("signalLevel.txt");
-			
+
 		} catch (Exception e) {
 			//RSSI = -1 * (Math.random() * 100) + 1;		//for testing purposes
 			Random r = new Random();
@@ -345,10 +433,10 @@ public class PaintPane extends JComponent {
 			RSSI = -1 * r.nextInt(High-Low) + Low;
 			System.out.println("No file, will give random number as sample: " + RSSI);
 		}
-		
+
 		return (float) RSSI;
 	}
- 
+
 	public JTextField addSamlpeCount()
 	{
 		sampleCount = new JTextField("Number of samples: " + Integer.toString(mySamples.size()));
@@ -357,7 +445,7 @@ public class PaintPane extends JComponent {
 		sampleCount.setHorizontalAlignment(JTextField.LEFT);
 		return sampleCount;
 	}
- 
+
 	//delete sample by right clicking on it
 	public void deleteSample (JLabel label)
 	{
@@ -367,10 +455,10 @@ public class PaintPane extends JComponent {
 		remove(rmlabel);
 		mySamples.remove(index);
 		sampleCount.setText("Number of samples: " + Integer.toString(mySamples.size()));
- 
+
 		repaint();
 	}
- 
+
 	//delete sample by index -> used in the undo button 
 	public void deleteSample (int index)
 	{
@@ -379,10 +467,10 @@ public class PaintPane extends JComponent {
 		remove(rmlabel);
 		mySamples.remove(index-1);
 		sampleCount.setText("Number of samples: " + Integer.toString(mySamples.size()));
- 
+
 		repaint();
 	}
- 
+
 	public int setScale (double ms)
 	{
 		if (ms < 0)
@@ -391,13 +479,13 @@ public class PaintPane extends JComponent {
 			mapScale = ms ;
 		return 1;
 	}
- 
+
 	public void setAPpos (double x , double y)
 	{
 		AP_x = x;
 		AP_y =y;
 	}
- 
+
 	public JButton addUndoBtn()
 	{
 		undoBtn = new JButton("Undo");
@@ -424,7 +512,7 @@ public class PaintPane extends JComponent {
 			smoothOn = false ;
 		}
 		sampleCount.setText("Number of samples: " + Integer.toString(mySamples.size()));
- 
+
 	}
 	public JButton addClearBtn()
 	{
@@ -473,7 +561,7 @@ public class PaintPane extends JComponent {
 		smoothBtn.setEnabled(false);
 		return smoothBtn ;
 	}
- 	public JButton addApPositionBtn()
+	public JButton addApPositionBtn()
 	{
 		apPositionBtn = new JButton("Inseret AP location");
 		apPositionBtn.addActionListener(new ActionListener() {
@@ -484,13 +572,13 @@ public class PaintPane extends JComponent {
 		apPositionBtn.setEnabled(false);
 		return apPositionBtn;
 	}
- 	public void apPosition()
+	public void apPosition()
 	{
 		JOptionPane.showMessageDialog(null, "Click on the location of the Access Point on the map");
 		this.removeMouseListener(samplingML);
 		this.addMouseListener(apPoML);
 	}
- 	public JButton addNBtn()
+	public JButton addNBtn()
 	{
 		NBtn = new JButton("Compute n");
 		NBtn.addActionListener(new ActionListener(){
@@ -501,52 +589,52 @@ public class PaintPane extends JComponent {
 		NBtn.setEnabled(false);
 		return NBtn;
 	}
- 	public void compute_n ()
+	public void compute_n ()
 	{
 		try {
 			file.createNewFile();
- 
+
 			Writer = new BufferedWriter(new FileWriter(file));
 			Writer.write("RSSI"+"," +"X"+","+"Y" );
 			Writer.newLine();
- 
+
 			for(int i =0 ; i < mySamples.size(); i++)
 			{
 				Writer.write(mySamples.get(i).getSignal() +"," + mySamples.get(i).getX() + ","+mySamples.get(i).getY());
 				Writer.newLine();
- 
+
 			}
 			Writer.newLine();
 			Writer.flush();
 			Writer.close();
- 
+
 		}catch(IOException e){
 			System.out.println("There was a problem:" + e);
 		}
- 
+
 		ArrayList<Double> log_d = new ArrayList<Double>();
 		Double distance = 0.0;
 		int j =0 ;
 		while ( j < mySamples.size())
 		{
-			distance = Math.sqrt(Math.pow((Math.abs(mySamples.get(j).getX()-AP_x)),2) +  Math.pow((Math.abs(mySamples.get(j).getY()-AP_y)),2))/40;	// ??
+			distance = Math.sqrt(Math.pow((Math.abs(mySamples.get(j).getX()-AP_x)),2) +  Math.pow((Math.abs(mySamples.get(j).getY()-AP_y)),2))/40;
 			log_d.add(10*(Math.log10(distance))); 
 			distance = 0.0;
 			j++;
 		} 
- 
+
 		// Computing slope 
 		int s0 = 0;
 		Double s1 = 0.0 , s2 = 0.0, t1 =0.0 , t2 = 0.0;
 		Double M = 0.0 ;//, B = 0.0 ;
- 
+
 		for (int n=0 ; n < mySamples.size() ; n++ )
 		{
 			s0++;
 			if (mySamples.get(n).getX() == AP_x && mySamples.get(n).getY() == AP_y)
 			{
 				t1 = t1+ mySamples.get(n).getSignal();
- 
+
 				continue;
 			}
 			s1 = s1+ log_d.get(n);
@@ -554,7 +642,7 @@ public class PaintPane extends JComponent {
 			t1 = t1+ mySamples.get(n).getSignal();
 			t2 = t2 + (log_d.get(n) * mySamples.get(n).getSignal());
 		}
- 
+
 		M = ( s0*t2 - s1*t1 ) / (s0*s2 - s1*s1);
 		//B = ( s2*t1 - s1*t2 ) / (s0*s2 - s1*s1);
 		PLE_n = Math.abs(M);
