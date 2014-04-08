@@ -2,6 +2,8 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,37 +17,26 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.Timer;
+import javax.swing.*;
 
-import soft.getRSSI;
-import soft.sample;
-import soft.MAC_samples;
+import soft.*;
 
 public class PaintPane extends JComponent {
 
 	private static final long serialVersionUID = 1L;
-	static ArrayList<sample> mySamples = null;
+	public static ArrayList<sample> mySamples = null;
 	static ArrayList<JLabel> myLabels = null;
-	static ArrayList <MAC_samples> Mac = new ArrayList<MAC_samples>();
+	public static ArrayList <MAC_samples> Mac = new ArrayList<MAC_samples>();
 	private File file = new File("Mysamples_result.csv");
 	private BufferedWriter Writer;
 
+	private static ArrayList<MAC_samples> rogueAPs = new ArrayList<MAC_samples>();
+
 	private JButton undoBtn ;
 	private JButton clearBtn ;
-	private JButton NBtn;
-	private JButton apPositionBtn ;
 	private JButton smoothBtn;
+	private JButton doneBtn;
 	private JTextField sampleCount ;
 
 	public double mapScale ;
@@ -56,8 +47,8 @@ public class PaintPane extends JComponent {
 	private int x2 ,y2 ;
 
 	//need for saving samples
-	int i=0; // # of distinct MAC address
-	int n =0; //Counter
+	int i = 0; // # of distinct MAC address
+	int n = 0; //Counter
 
 	public boolean smoothOn = false;
 
@@ -83,94 +74,30 @@ public class PaintPane extends JComponent {
 				if (e.getX() > image.getWidth() || e.getY() > image.getHeight())	//prevents user from taking samples outside of the image
 					return;
 
-				//				JOptionPane.showMessageDialog(null, "These are your coordinates ("+e.getX()+","+e.getY()+").\nClick OK and wait 5 seconds.");
-				TimeOutOptionPane countdown_msg = new TimeOutOptionPane();
-				countdown_msg.showTimeoutDialog(MainWindow.f, "Please wait while we take samples...", "", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, new Object[] {}, null);
+				JLabel l = new JLabel ("Please wait while we take samples...", JLabel.CENTER);
+				new Thread (new TimeOutOptionPane(MainWindow.f, l, "", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, new Object[] {}, null)).start();
+				
+				
+				/*************************WORK HERE************************/
+				/*	float RSSI = GetRSSI();
 
-
-				/******************************** Savaing sample for each mAC Adderss****************************/
-				String S ="";
-				String MACAdd ="";
-				float RSSI =0;
-				BufferedReader br = null;
-				String show ="";
-				ArrayList <Float> sigL= new ArrayList<Float>();
-				try {
-					br = new BufferedReader(new FileReader("result.txt")); 
-				} catch (FileNotFoundException k) {
-					// TODO Auto-generated catch block
-					k.printStackTrace();
-				}
-				try {
-					while ((S = br.readLine()) != null) {
-						//Read MAC address line
-						if(S.startsWith("Address:"))
-						{
-							MACAdd = S.substring(9);
-							if (Mac.isEmpty())
-							{
-								MAC_samples M = new MAC_samples(MACAdd);
-								Mac.add(M);
-								i++;
-							}
-							else
-							{
-								while (n<i)
-								{
-									if (MACAdd.equals(Mac.get(n).getMac()))
-										break;
-									else
-										n++;
-								}
-
-								if(n==i )
-								{
-									MAC_samples M = new MAC_samples(MACAdd);
-									Mac.add(M);
-									i++;
-								}
-							}
-						}
-						//Read RSSI
-						if(S.startsWith("RSSI"))
-						{ 
-							RSSI = Float.parseFloat(S.substring(6));
-							sample s = new sample(RSSI, e.getX(), e.getY());
-							Mac.get(n).A.add(s);
-							sigL.add(RSSI);
-							n=0;
-							MACAdd = "";
-
-
-						}
-					}
-				} catch (IOException t) {
-					// TODO Auto-generated catch block
-					t.printStackTrace();
-				}
-
-				/*for(int m =0 ; m < Mac.size() ; m++)
-				{
-					System.out.println("Mac address is:" + Mac.get(m).getMac());
-					for(int j =0; j< Mac.get(m).A.size() ;j++)
-					{ 
-						System.out.println("My elements is"+ Mac.get(m).A.get(j).getSignal()+" " + Mac.get(m).A.get(j).getX()+ " " +Mac.get(m).A.get(j).getY());
-					}
-				}*/
-
-				sample D = new sample(RSSI , e.getX(), e.getY()); // to save all samples ( not for specific MAC address)
-				mySamples.add(D);
-
-				/*******************************End saving samples*******************************************/
-
-				//float RSSI = GetRSSI();
+				sample s = new sample(RSSI, e.getX(), e.getY());	
+				mySamples.add(s);
 				JLabel tryLabel = new JLabel(Integer.toString(mySamples.size()+1));
-				for(int n =0 ; n < sigL.size(); n++)
+				tryLabel.setToolTipText(Float.toString(s.getSignal()));	
+				 */
+
+				String show = "";
+				Parser.parseMultiAP(e);
+
+				JLabel tryLabel = new JLabel(Integer.toString(mySamples.size()+1));
+
+				for(int n =0 ; n < Parser.sigL.size(); n++)
 				{
 					if (n ==0)
-						show = show  + Float.toString(sigL.get(n));
+						show = show  + Float.toString(Parser.sigL.get(n));
 					else
-						show = show + "," + Float.toString(sigL.get(n));
+						show = show + "," + Float.toString(Parser.sigL.get(n));
 
 				}
 				tryLabel.setToolTipText(show);	
@@ -191,6 +118,7 @@ public class PaintPane extends JComponent {
 				tryLabel.setVisible(true);
 				myLabels.add(tryLabel);
 				add(tryLabel);
+
 				undoBtn.setEnabled(true);
 				clearBtn.setEnabled(true);
 				smoothBtn.setEnabled(true);
@@ -204,8 +132,7 @@ public class PaintPane extends JComponent {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				setAPpos(e.getX(), e.getY());
-				JOptionPane.showMessageDialog(null, "The AP's location is: (" + AP_x + ","+ AP_y + ")");
-				NBtn.setEnabled(true);		//HERE check for the number of samples taken???	
+				JOptionPane.showMessageDialog(null, "The AP's location is: (" + AP_x + ","+ AP_y + ")");	
 				removeMouseListener(apPoML);
 				addMouseListener(samplingML);//apPoFlag = false;
 			}
@@ -298,11 +225,11 @@ public class PaintPane extends JComponent {
 		image = im ;
 		this.setBounds(new Rectangle(im.getWidth(), im.getHeight()));
 		repaint();
-		apPositionBtn.setEnabled(true);
-		smoothBtn.setEnabled(true);
 
 		//prompt user to scale
 		JOptionPane.showMessageDialog(null, "Must determine the map scale before taking samples.\n click on two points and enter the real distance between them in meters" );
+		smoothBtn.setEnabled(true);
+		doneBtn.setEnabled(true);
 
 	}
 
@@ -378,8 +305,6 @@ public class PaintPane extends JComponent {
 			for (int i=0; i<mySamples.size() ; i++)
 			{
 				value = (int)(mySamples.get(i).getSignal()) * -1;		//the strength of the red from the signal level
-				//System.out.println(value);			//test
-				//myColor = new Color(255, value,value, 200);		//WHAT IS 128????
 				myColor = getColor (value);
 				g.setColor(myColor); 
 				g.fillRect(mySamples.get(i).getX()-10, mySamples.get(i).getY()-10, 20, 20);		//
@@ -421,9 +346,9 @@ public class PaintPane extends JComponent {
 		//In case of 1 AP (the one we're connected to)
 		double RSSI ;
 		try {
-			String unixCommand = "sh ws.sh";
+			String unixCommand = "sh ws.sh";	//execute scan.sh in case of multi-AP scanning
 			getRSSI.runShellScript(unixCommand);
-			RSSI = getRSSI.readMyFile("signalLevel.txt");
+			RSSI = getRSSI.readMyFile("signalLevel.txt"); 	//read result.txt in case of multi-AP scanning
 
 		} catch (Exception e) {
 			//RSSI = -1 * (Math.random() * 100) + 1;		//for testing purposes
@@ -488,7 +413,14 @@ public class PaintPane extends JComponent {
 
 	public JButton addUndoBtn()
 	{
-		undoBtn = new JButton("Undo");
+
+		ImageIcon undoIcon = new ImageIcon("resources/undoIcon.png");
+		Image img = undoIcon.getImage();  
+		Image newimg = img.getScaledInstance(18, 18, java.awt.Image.SCALE_SMOOTH);  
+		undoIcon = new ImageIcon(newimg); 
+
+		undoBtn = new JButton(undoIcon);
+		undoBtn.setToolTipText("Undo");
 		undoBtn.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0){
 				undo();
@@ -516,7 +448,13 @@ public class PaintPane extends JComponent {
 	}
 	public JButton addClearBtn()
 	{
-		clearBtn = new JButton("Clear");
+		ImageIcon clearIcon = new ImageIcon("resources/clearIcon.png");
+		Image img = clearIcon.getImage();  
+		Image newimg = img.getScaledInstance(18, 18, java.awt.Image.SCALE_SMOOTH);  
+		clearIcon = new ImageIcon(newimg); 
+
+		clearBtn = new JButton(clearIcon);
+		clearBtn.setToolTipText("Clear all data");
 		clearBtn.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0){
 				clear();
@@ -561,34 +499,97 @@ public class PaintPane extends JComponent {
 		smoothBtn.setEnabled(false);
 		return smoothBtn ;
 	}
-	public JButton addApPositionBtn()
+
+	public JButton addDoneBtn()
 	{
-		apPositionBtn = new JButton("Inseret AP location");
-		apPositionBtn.addActionListener(new ActionListener() {
+		doneBtn = new JButton("Done");
+		doneBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				apPosition();
+				Done();
 			}
 		});
-		apPositionBtn.setEnabled(false);
-		return apPositionBtn;
+		doneBtn.setEnabled(false);
+		return doneBtn;
 	}
+
+	public void Done()
+	{
+		/*
+		 * On click, a new window will appear containing the list of 
+		 * all scanned AP's. and the user will have the option to
+		 * authorize some of them.
+		 */
+
+		ArrayList<JCheckBox> checkBoxList = new ArrayList<JCheckBox> ();
+
+		JPanel p = new JPanel(new GridLayout(0,1));
+
+		p.add(new JLabel("Please select authorized Access Points: "));
+
+		for(int x = 0; x < Mac.size(); x++)
+		{
+			String text = "<html>"+Mac.get(x).Essid+"<br>"+Mac.get(x).MacAddress+"</html>";
+			checkBoxList.add(new JCheckBox(text));
+			p.add(checkBoxList.get(x));
+		}
+
+		JOptionPane.showMessageDialog(null,p);
+
+		for(int x = 0; x < Mac.size(); x++)
+		{
+			if (!checkBoxList.get(x).isSelected())
+			{
+				String entry = checkBoxList.get(x).getText();
+				int macindex = entry.indexOf("<br>", 0);
+				String mac = entry.substring(macindex+4, entry.length()-7);	//to get the mac address from the string in the jcheckbox
+
+				if (getEntryFromMACArray(mac) != null)
+				{	
+					rogueAPs.add(getEntryFromMACArray(mac));
+				}
+			}
+		}
+		
+		p.removeAll();
+		p.add(new JLabel("Rogue Access Points:"));
+		
+		for (int x = 0; x < rogueAPs.size(); x++)
+		{
+			String text = "<html>"+rogueAPs.get(x).Essid+"<br>"+rogueAPs.get(x).MacAddress+"</html>";
+			p.add(new JLabel(text));
+		}
+		
+		JOptionPane.showMessageDialog(null, p);
+		
+		System.out.println(rogueAPs.get(0).MacAddress);
+	}
+
+	
+	public MAC_samples getEntryFromMACArray(String mac)
+	{
+		/*
+		 * Given a MAC address in string format, return the corresponding entry in the mac list
+		 */
+		
+		for (int i = 0; i < PaintPane.Mac.size(); i++)
+		{
+			if (mac.equals(PaintPane.Mac.get(i).getMac()))
+			{
+				return PaintPane.Mac.get(i);
+			}
+			else
+				continue;
+		}
+		return null;
+	}
+
 	public void apPosition()
 	{
 		JOptionPane.showMessageDialog(null, "Click on the location of the Access Point on the map");
 		this.removeMouseListener(samplingML);
 		this.addMouseListener(apPoML);
 	}
-	public JButton addNBtn()
-	{
-		NBtn = new JButton("Compute n");
-		NBtn.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent arg0){
-				compute_n();
-			}
-		});
-		NBtn.setEnabled(false);
-		return NBtn;
-	}
+
 	public void compute_n ()
 	{
 		try {

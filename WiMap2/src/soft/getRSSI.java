@@ -36,7 +36,7 @@ public class getRSSI {
 				JLabel rssiLabel = new JLabel();
 				Color color = new Color(0xCC0000);
 				Color clBrighter = new Color (0);
-				
+
 				while ( (record=data_is.readLine()) != null ) {
 
 					color = new Color(0xCC0000);
@@ -70,6 +70,8 @@ public class getRSSI {
 						MainWindow.av_net_panel.add(tempPanel);
 
 					}
+
+
 				}
 			} catch (IOException e) {
 				// catch io errors from FileInputStream or readLine()
@@ -157,22 +159,22 @@ public class getRSSI {
 		}
 		return -1;
 	}
-	
+
 	static Color Blend(Color clOne, Color clTwo, float fAmount) {
-	    float fInverse = (float) (1.0 - fAmount);
+		float fInverse = (float) (1.0 - fAmount);
 
-	    // I had to look up getting color components in java.  Google is good :)
-	    float afOne[] = new float[3];
-	    clOne.getColorComponents(afOne);
-	    float afTwo[] = new float[3]; 
-	    clTwo.getColorComponents(afTwo);    
+		// I had to look up getting color components in java.  Google is good :)
+		float afOne[] = new float[3];
+		clOne.getColorComponents(afOne);
+		float afTwo[] = new float[3]; 
+		clTwo.getColorComponents(afTwo);    
 
-	    float afResult[] = new float[3];
-	    afResult[0] = afOne[0] * fAmount + afTwo[0] * fInverse;
-	    afResult[1] = afOne[1] * fAmount + afTwo[1] * fInverse;
-	    afResult[2] = afOne[2] * fAmount + afTwo[2] * fInverse;
+		float afResult[] = new float[3];
+		afResult[0] = afOne[0] * fAmount + afTwo[0] * fInverse;
+		afResult[1] = afOne[1] * fAmount + afTwo[1] * fInverse;
+		afResult[2] = afOne[2] * fAmount + afTwo[2] * fInverse;
 
-	    return new Color (afResult[0], afResult[1], afResult[2]);
+		return new Color (afResult[0], afResult[1], afResult[2]);
 	}
 
 	//function to execute the shell script

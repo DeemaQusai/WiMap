@@ -23,17 +23,18 @@ public class MainWindow extends JPanel {
 	private static JScrollPane sp ;
 	static int windowColor = 0xE6E6FA;
 
-	//lolo
 	public static JMenuBar createMenuBar()
 	{
-		JMenuBar menuBarUpper = new JMenuBar();		//define and initialized menuBarUpper		lolo
+		JMenuBar menuBarUpper = new JMenuBar();		//define and initialized menuBarUpper
 		menuBarUpper.setBackground(new Color(windowColor));
 		f.setJMenuBar(menuBarUpper);			//add the menuBarUpper to the frame
 
 		JMenu fileMenu = new JMenu("File");		//create the "file" menu
+		JMenu toolsMenu = new JMenu("Tools");
 		JMenu HelpMenu = new JMenu("Help");		//create "help" menu
 
 		menuBarUpper.add(fileMenu);							//add the "file" menu to the bar
+		menuBarUpper.add(toolsMenu);
 		menuBarUpper.add(HelpMenu);							//add "help" menu to the bar
 
 		JMenuItem newItem = new JMenuItem("New");
@@ -45,7 +46,12 @@ public class MainWindow extends JPanel {
 		final JMenuItem saveItem = new JMenuItem("Save");					//create the save
 		saveItem.setAccelerator(KeyStroke.getKeyStroke('S', KeyEvent.CTRL_DOWN_MASK));
 		
-		JMenuItem exit = new JMenuItem("Exit");						//create the exit 
+		JMenuItem exit = new JMenuItem("Exit");						//create the exit
+		
+		JMenuItem computePLEItem = new JMenuItem("Compute PLE");
+		JMenuItem insertAPItem = new JMenuItem("Insert AP");
+		JMenuItem changeScaleItem = new JMenuItem("Change map scale");
+		
 		JMenuItem aboutItem = new JMenuItem("About WiMAP");			//create the about 
 
 		newItem.setToolTipText("New project");		//tool tip (on mouse hover)
@@ -57,7 +63,31 @@ public class MainWindow extends JPanel {
 		fileMenu.add(openItem);			//add the open to the "file" menu
 		fileMenu.add(saveItem);			//add the open to the "file" menu
 		fileMenu.add(exit);				//add the exit to the "file" menu
+		
+		toolsMenu.add(computePLEItem);
+		toolsMenu.add(insertAPItem);
+		toolsMenu.add(changeScaleItem);
+		
 		HelpMenu.add(aboutItem);		//add the about to the "Help" menu
+		
+		computePLEItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				panelCanvas.compute_n();
+			}
+		});
+		
+		insertAPItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				panelCanvas.apPosition();
+			}
+		});
+		
+		changeScaleItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				/******WORK HERE******/
+				
+			}
+		});
 
 		newItem.addActionListener(new ActionListener() {		//action listener for open
 			public void actionPerformed(ActionEvent event) {
@@ -157,7 +187,7 @@ public class MainWindow extends JPanel {
 
 	public static void aboutActionPerformed (ActionEvent event)
 	{
-		JOptionPane.showMessageDialog(f, "WiMAP ver2.0\n© Copyright, Jordan University of Science and Technology 2013.\n"
+		JOptionPane.showMessageDialog(f, "WiMAP ver2.0\nÂ© Copyright, Jordan University of Science and Technology 2013.\n"
 				+ "All rights reserved.\nNetwork Engineering and Security Department\n- Bayan Taani\n- Wala'a Adel\n"
 				+ "- Deema Qusai", "About WiMAP", 3);
 	}
@@ -218,8 +248,7 @@ public class MainWindow extends JPanel {
 		toolBar.add(panelCanvas.addUndoBtn());		//add undo button to the tool bar
 		toolBar.add(panelCanvas.addClearBtn());		//add clear button to the tool bar
 		toolBar.add(panelCanvas.addSmoothBtn());	//add smooth button to the tool bar
-		toolBar.add(panelCanvas.addNBtn());         //add compute n button to tool bar
-		toolBar.add(panelCanvas.addApPositionBtn());
+		toolBar.add(panelCanvas.addDoneBtn());
 	}
 
 
