@@ -1,0 +1,8 @@
+Address: 00:90:D0:EC:67:C6
+ESSID:"SpeedTouchFB4E32"
+RSSI: -35 
+---------------------------------
+Address: 4C:09:B4:07:CF:F0
+ESSID:"riziq"
+RSSI: -86 
+---------------------------------
