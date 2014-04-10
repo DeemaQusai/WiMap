@@ -5,7 +5,7 @@ import java.awt.Component;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-
+//TESTING
 /*
  * This is the message box that appears after the users clicks on a map,
  * it counts down then automatically exits
