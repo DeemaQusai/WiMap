@@ -33,12 +33,15 @@ public class PaintPane extends JComponent {
 
 	private static ArrayList<MAC_samples> rogueAPs = new ArrayList<MAC_samples>();
 
+
+	private static final int DEFAULT_RES = 6;		// the default resolution for smoothing
 	private JButton undoBtn ;
 	private JButton clearBtn ;
 	private JButton smoothBtn;
 	private JButton doneBtn;
 	private JTextField sampleCount ;
 
+	private int l = DEFAULT_RES ;
 	public double mapScale ;
 	public double AP_x , AP_y;
 	public double   PLE_n =0;			//path loss exponent
@@ -226,8 +229,10 @@ public class PaintPane extends JComponent {
 		this.setBounds(new Rectangle(im.getWidth(), im.getHeight()));
 		repaint();
 
+		if (l > image.getHeight() && l > image.getWidth())
+			l = DEFAULT_RES; 		// if resolution is invalid restore default 
 		//prompt user to scale
-		JOptionPane.showMessageDialog(null, "Must determine the map scale before taking samples.\n click on two points and enter the real distance between them in meters" );
+		JOptionPane.showMessageDialog(null, "Must determine the map scale before taking samples.\nclick on two points and enter the real distance between them in meters" );
 		smoothBtn.setEnabled(true);
 		doneBtn.setEnabled(true);
 
@@ -254,7 +259,7 @@ public class PaintPane extends JComponent {
 
 		if (smoothOn)
 		{
-			int l =  6;
+			
 			int p = 8;
 			double d = 0;
 
@@ -649,5 +654,30 @@ public class PaintPane extends JComponent {
 		PLE_n = Math.abs(M);
 		JOptionPane.showMessageDialog(null, "Path loss exponent (n) = "+ PLE_n );
 	}
+
+	public int getSmoothRes ()
+	{
+		return l;
+	}
+
+	public boolean setSmoothRes(int sr)
+	{
+		if(image != null)		// if the image is there check the limit to the resolution (the square's height)
+		{
+			if (sr < image.getHeight()&& sr < image.getWidth())	// if input is within limit
+			{
+				l = sr;
+				return true;
+			}
+			else			// input is invalid
+				return false;
+		}
+		else				// there is no image to compare, must compare at opening image
+		{
+			l = sr;
+			return true;
+		}
+	}
+
 }	// end of class
 

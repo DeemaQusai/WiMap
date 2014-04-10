@@ -51,6 +51,7 @@ public class MainWindow extends JPanel {
 		JMenuItem computePLEItem = new JMenuItem("Compute PLE");
 		JMenuItem insertAPItem = new JMenuItem("Insert AP");
 		JMenuItem changeScaleItem = new JMenuItem("Change map scale");
+		JMenuItem smoothResItem = new JMenuItem("Smooth resolution");
 		
 		JMenuItem aboutItem = new JMenuItem("About WiMAP");			//create the about 
 
@@ -58,15 +59,17 @@ public class MainWindow extends JPanel {
 		openItem.setToolTipText("Open Floor Plan");		//tool tip (on mouse hover)
 		saveItem.setToolTipText("Save Map");			//tool tip (on mouse hover)
 		exit.setToolTipText("Exit application");		//tool tip (on mouse hover)
+		smoothResItem.setToolTipText("Effects speed");		//??
 
-		fileMenu.add(newItem);			//add the open to the "file" menu
+		fileMenu.add(newItem);			//add the new to the "file" menu
 		fileMenu.add(openItem);			//add the open to the "file" menu
-		fileMenu.add(saveItem);			//add the open to the "file" menu
+		fileMenu.add(saveItem);			//add the save to the "file" menu
 		fileMenu.add(exit);				//add the exit to the "file" menu
 		
 		toolsMenu.add(computePLEItem);
 		toolsMenu.add(insertAPItem);
 		toolsMenu.add(changeScaleItem);
+		toolsMenu.add(smoothResItem);
 		
 		HelpMenu.add(aboutItem);		//add the about to the "Help" menu
 		
@@ -84,8 +87,26 @@ public class MainWindow extends JPanel {
 		
 		changeScaleItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				/******WORK HERE******/
-				
+				panelCanvas.removeMouseListener(panelCanvas.samplingML);
+				JOptionPane.showMessageDialog(null, "To rescale\nClick on two points and enter the real distance between them in meters" );
+				panelCanvas.addMouseListener(panelCanvas.scalingML);				
+			}
+		});
+
+		smoothResItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				try {
+					String input = JOptionPane.showInputDialog(null, "Enter size of square in pixels", ""); // ??
+					if (panelCanvas.setSmoothRes(Integer.parseInt(input)))
+						JOptionPane.showMessageDialog(null, "New smooth Resolution : " + panelCanvas.getSmoothRes());
+					else
+						JOptionPane.showMessageDialog(null, "Invalid input, will restore default resolution\nSmooth Resolution: " + panelCanvas.getSmoothRes());
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+
 			}
 		});
 
@@ -93,7 +114,6 @@ public class MainWindow extends JPanel {
 			public void actionPerformed(ActionEvent event) {
 				boolean flag = true ;
 				try {
-
 					newActionPerformed (event);
 				} catch (Exception e)
 				{
