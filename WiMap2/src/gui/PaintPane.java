@@ -31,7 +31,8 @@ public class PaintPane extends JComponent {
 	private File file = new File("Mysamples_result.csv");
 	private BufferedWriter Writer;
 
-	private static ArrayList<MAC_samples> rogueAPs = new ArrayList<MAC_samples>();
+	public static ArrayList<MAC_samples> rogueAPs = new ArrayList<MAC_samples>();
+	public static ArrayList<MAC_samples> authAPs = new ArrayList<MAC_samples>();
 
 
 	private static final int DEFAULT_RES = 6;		// the default resolution for smoothing
@@ -82,7 +83,9 @@ public class PaintPane extends JComponent {
 				
 				
 				/*************************WORK HERE************************/
-				/*	float RSSI = GetRSSI();
+			
+				/*
+				float RSSI = GetRSSI();
 
 				sample s = new sample(RSSI, e.getX(), e.getY());	
 				mySamples.add(s);
@@ -553,7 +556,9 @@ public class PaintPane extends JComponent {
 					rogueAPs.add(getEntryFromMACArray(mac));
 				}
 			}
+		
 		}
+		authAPs();
 		
 		p.removeAll();
 		p.add(new JLabel("Rogue Access Points:"));
@@ -566,14 +571,25 @@ public class PaintPane extends JComponent {
 		
 		JOptionPane.showMessageDialog(null, p);
 		
-		System.out.println(rogueAPs.get(0).MacAddress);
+		EstimateAP.estimateAP(rogueAPs.get(0));
+		
 	}
 
+	public void authAPs()
+	{
+		for (MAC_samples item : Mac)
+		{
+			if (!rogueAPs.contains(item))
+			{
+				authAPs.add(item);
+			}
+		}
+	}
 	
-	public MAC_samples getEntryFromMACArray(String mac)
+	public static MAC_samples getEntryFromMACArray(String mac)
 	{
 		/*
-		 * Given a MAC address in string format, return the corresponding entry in the mac list
+		 * Given a MAC address in string format, return the corresponding entry in the Mac list
 		 */
 		
 		for (int i = 0; i < PaintPane.Mac.size(); i++)

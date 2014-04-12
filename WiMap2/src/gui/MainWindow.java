@@ -14,7 +14,7 @@ import javax.swing.*;
 public class MainWindow extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static BufferedImage image;
-	private static PaintPane panelCanvas;
+	public static PaintPane panelCanvas;
 	private static JScrollPane jsp;
 	private static JPanel sidePanel;
 	public static ArrayList<JPanel> av_net_panel = new ArrayList<JPanel> ();
@@ -50,6 +50,7 @@ public class MainWindow extends JPanel {
 		
 		JMenuItem computePLEItem = new JMenuItem("Compute PLE");
 		JMenuItem insertAPItem = new JMenuItem("Insert AP");
+		JMenuItem manageAPsItem = new JMenuItem("Manage Access Points");
 		JMenuItem changeScaleItem = new JMenuItem("Change map scale");
 		JMenuItem smoothResItem = new JMenuItem("Smooth resolution");
 		
@@ -67,6 +68,7 @@ public class MainWindow extends JPanel {
 		fileMenu.add(exit);				//add the exit to the "file" menu
 		
 		toolsMenu.add(computePLEItem);
+		toolsMenu.add(manageAPsItem);
 		toolsMenu.add(insertAPItem);
 		toolsMenu.add(changeScaleItem);
 		toolsMenu.add(smoothResItem);
@@ -82,6 +84,12 @@ public class MainWindow extends JPanel {
 		insertAPItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				panelCanvas.apPosition();
+			}
+		});
+		
+		manageAPsItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				new MngAP();
 			}
 		});
 		
