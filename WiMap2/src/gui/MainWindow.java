@@ -75,21 +75,68 @@ public class MainWindow extends JPanel {
 		
 		HelpMenu.add(aboutItem);		//add the about to the "Help" menu
 		
+		/*******************************File Menu******************************************/
+		// NEW 
+		newItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				boolean flag = true ;
+				try {
+					newActionPerformed (event);
+				} catch (Exception e)
+				{
+					flag = false ;
+				}
+				saveItem.setEnabled(flag);
+			}
+		});
+
+		// OPEN
+		openItem.addActionListener(new ActionListener() {		//action listener for open
+			public void actionPerformed(ActionEvent event) {
+				boolean flag = true ;
+				try {
+
+					openActionPerformed (event);
+				} catch (Exception e)
+				{
+					flag = false ;
+				}
+				saveItem.setEnabled(flag);
+			}
+		});
+
+		// SAVE
+		saveItem.addActionListener(new ActionListener() {		//action listener for open
+			public void actionPerformed(ActionEvent event) {
+				saveActionPerformed (event);
+			}		
+		});
+		saveItem.setEnabled(false);
+
+		// EXIT
+		exit.addActionListener(new ActionListener() {			//action listener for exit
+			public void actionPerformed(ActionEvent event) {
+				System.exit(0);
+			}
+
+		});
+
+		/*******************************Tool Menu******************************************/
 		computePLEItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				panelCanvas.compute_n();
 			}
 		});
 		
-		insertAPItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				panelCanvas.apPosition();
-			}
-		});
-		
 		manageAPsItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				new MngAP();
+			}
+		});
+		
+		insertAPItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				panelCanvas.apPosition();
 			}
 		});
 		
@@ -118,47 +165,8 @@ public class MainWindow extends JPanel {
 			}
 		});
 
-		newItem.addActionListener(new ActionListener() {		//action listener for open
-			public void actionPerformed(ActionEvent event) {
-				boolean flag = true ;
-				try {
-					newActionPerformed (event);
-				} catch (Exception e)
-				{
-					flag = false ;
-				}
-				saveItem.setEnabled(flag);
-			}
-		});
-
-		openItem.addActionListener(new ActionListener() {		//action listener for open
-			public void actionPerformed(ActionEvent event) {
-				boolean flag = true ;
-				try {
-
-					openActionPerformed (event);
-				} catch (Exception e)
-				{
-					flag = false ;
-				}
-				saveItem.setEnabled(flag);
-			}
-		});
-
-		saveItem.addActionListener(new ActionListener() {		//action listener for open
-			public void actionPerformed(ActionEvent event) {
-				saveActionPerformed (event);
-			}		
-		});
-		saveItem.setEnabled(false);
-
-		exit.addActionListener(new ActionListener() {			//action listener for exit
-			public void actionPerformed(ActionEvent event) {
-				System.exit(0);
-			}
-
-		});
-
+		
+		/*******************************Help Menu******************************************/
 		aboutItem.addActionListener(new ActionListener() {			//action listener for about
 			public void actionPerformed(ActionEvent event) {
 				aboutActionPerformed (event);
@@ -183,7 +191,10 @@ public class MainWindow extends JPanel {
 	public static void saveActionPerformed (ActionEvent event)
 	{	
 		if(image == null)
+		{
+			JOptionPane.showMessageDialog(null, "No image to save");
 			return ;
+		}
 		JFileChooser saveFC = new JFileChooser();	//let the user browse for an image  
 		saveFC.setAcceptAllFileFilterUsed(false);
 		saveFC.addChoosableFileFilter(new ImageFilter());
