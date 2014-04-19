@@ -165,7 +165,6 @@ public class MainWindow extends JPanel {
 			}
 		});
 
-		
 		/*******************************Help Menu******************************************/
 		aboutItem.addActionListener(new ActionListener() {			//action listener for about
 			public void actionPerformed(ActionEvent event) {
@@ -235,6 +234,7 @@ public class MainWindow extends JPanel {
 	{
 		String userhome = System.getProperty("user.dir");
 		JFileChooser openFC = new JFileChooser(userhome);			//let the user browse for an image
+		openFC.setAccessory(new ImagePreview(openFC));
 		openFC.setAcceptAllFileFilterUsed(false);			// not all files are accepted
 		openFC.addChoosableFileFilter(new ImageFilter());	//use the image filter class
 
@@ -272,6 +272,13 @@ public class MainWindow extends JPanel {
 
 	}
 
+	public static void saveMacSamples()
+	{
+		if (PaintPane.Mac.isEmpty())
+			return ;
+		
+	}
+	
 	/*Add the upper toolbar*/
 	public void addToolBar()
 	{
