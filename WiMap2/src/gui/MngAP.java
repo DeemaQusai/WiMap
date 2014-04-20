@@ -38,7 +38,7 @@ public class MngAP extends JFrame {
 		lm0 = new DefaultListModel();
 		for(int x = 0; x < PaintPane.authAPs.size(); x++)
 		{
-			lm0.addElement(PaintPane.authAPs.get(x).MacAddress);
+			lm0.addElement(PaintPane.authAPs.get(x).getMacAddress());
 		}
 		authAPList = new JList(lm0);
 
@@ -52,7 +52,7 @@ public class MngAP extends JFrame {
 		lm = new DefaultListModel();
 		for(int x = 0; x < PaintPane.Mac.size(); x++)
 		{
-			lm.addElement(PaintPane.Mac.get(x).MacAddress);
+			lm.addElement(PaintPane.Mac.get(x).getMacAddress());
 		}
 		avAPList = new JList(lm);
 		scrollPane_1.setViewportView(avAPList);
@@ -144,7 +144,7 @@ public class MngAP extends JFrame {
 
 		for (int i = 0; i < PaintPane.authAPs.size(); i++)
 		{
-			if (mac.equals(PaintPane.authAPs.get(i).getMac()))
+			if (mac.equals(PaintPane.authAPs.get(i).getMacAddress()))
 			{
 				return PaintPane.authAPs.get(i);
 			}

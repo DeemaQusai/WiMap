@@ -46,7 +46,7 @@ public class Parser {
 					{
 						while (n < i)
 						{
-							if (MACAdd.equals(PaintPane.Mac.get(n).getMac()))
+							if (MACAdd.equals(PaintPane.Mac.get(n).getMacAddress()))
 								break;
 							else
 								n++;
@@ -61,7 +61,7 @@ public class Parser {
 					}
 				}else if (S.startsWith("ESSID")) {
 					essid  = S.substring(6);
-					PaintPane.Mac.get(n).Essid = essid;
+					PaintPane.Mac.get(n).setESSID(essid);
 
 				}
 				//Read RSSI
@@ -69,7 +69,7 @@ public class Parser {
 				{ 
 					RSSI = Float.parseFloat(S.substring(6));
 					sample s = new sample(RSSI, e.getX(), e.getY());
-					PaintPane.Mac.get(n).A.add(s);
+					PaintPane.Mac.get(n).addSample(s);
 					sigL.add(RSSI);
 					n=0;
 					MACAdd = "";

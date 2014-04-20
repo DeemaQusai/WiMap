@@ -7,9 +7,9 @@ import java.awt.event.*;
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
-
 import javax.imageio.*;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MainWindow extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -194,9 +194,17 @@ public class MainWindow extends JPanel {
 			JOptionPane.showMessageDialog(null, "No image to save");
 			return ;
 		}
-		JFileChooser saveFC = new JFileChooser();	//let the user browse for an image  
+		String userhome = System.getProperty("user.dir");
+		JFileChooser saveFC = new JFileChooser(userhome);	//let the user browse for an image  
 		saveFC.setAcceptAllFileFilterUsed(false);
-		saveFC.addChoosableFileFilter(new ImageFilter());
+		//		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("Image Files", "jpg", "png", "tif"));
+
+		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("jpg", "jpg"));
+		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("gif", "gif"));
+		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("png", "png"));
+//		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("tif" ,"tif"));
+
+//		saveFC.addChoosableFileFilter(new ImageFilter());
 
 		int fileToSave = saveFC.showSaveDialog(jsp);
 		String saveImagePath = null;
@@ -205,19 +213,36 @@ public class MainWindow extends JPanel {
 		{
 			File file = saveFC.getSelectedFile();
 			saveImagePath = file.getAbsolutePath();
+			boolean flag = true;
+			String[] exts ;
+			exts = ((FileNameExtensionFilter)saveFC.getFileFilter()).getExtensions();
+			if (saveFC.getFileFilter() instanceof FileNameExtensionFilter) 
+			{
+		        String nameLower = file.getName().toLowerCase();
+		        for (String ext : exts) { // check if it already has a valid extension
+		            if (nameLower.endsWith('.' + ext.toLowerCase())) {
+		            	saveImagePath = file.getAbsolutePath(); // 
+		            	flag = false ;
+		            	break;
+		            }
+		        }
+		        // if not, append the first extension from the selected filter
+		        if (flag)
+		        saveImagePath = saveImagePath + '.' + exts[0];
+		    }
 			try {
 				BufferedImage saving = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 				Graphics graphics = saving.createGraphics();
 				panelCanvas.paint(graphics);
 				Graphics g = panelCanvas.getGraphics();
 				g.dispose();
-				File map = new File(saveImagePath+".png");		//there must be a way
-				ImageIO.write(saving, "png", map);
+				File map = new File(saveImagePath);		//there must be a way
+				ImageIO.write(saving, exts[0], map);
 			} catch(IOException exc) {
 				System.out.println("problem saving");
 			}catch (Exception e)
 			{
-				System.err.println(e.getMessage());
+				e.printStackTrace();
 
 			}
 		}

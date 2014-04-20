@@ -16,7 +16,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Random;
+//import java.util.Random;
 
 import javax.swing.*;
 
@@ -349,7 +349,7 @@ public class PaintPane extends JComponent {
 
 		return rgb_color;
 	}
-
+/*
 	public float GetRSSI ()	{	// EXECUTE SCRIPT FILE HERE		
 		//In case of 1 AP (the one we're connected to)
 		double RSSI ;
@@ -369,7 +369,7 @@ public class PaintPane extends JComponent {
 
 		return (float) RSSI;
 	}
-
+*/
 	public JTextField addSamlpeCount()
 	{
 		sampleCount = new JTextField("Number of samples: " + Integer.toString(mySamples.size()));
@@ -536,7 +536,7 @@ public class PaintPane extends JComponent {
 
 		for(int x = 0; x < Mac.size(); x++)
 		{
-			String text = "<html>"+Mac.get(x).Essid+"<br>"+Mac.get(x).MacAddress+"</html>";
+			String text = "<html>"+Mac.get(x).getESSID()+"<br>"+Mac.get(x).getMacAddress()+"</html>";
 			checkBoxList.add(new JCheckBox(text));
 			p.add(checkBoxList.get(x));
 		}
@@ -565,14 +565,17 @@ public class PaintPane extends JComponent {
 		
 		for (int x = 0; x < rogueAPs.size(); x++)
 		{
-			String text = "<html>"+rogueAPs.get(x).Essid+"<br>"+rogueAPs.get(x).MacAddress+"</html>";
+			String text = "<html>"+rogueAPs.get(x).getESSID()+"<br>"+rogueAPs.get(x).getMacAddress()+"</html>";
 			p.add(new JLabel(text));
 		}
 		
 		JOptionPane.showMessageDialog(null, p);
 		
-		EstimateAP.estimateAP(rogueAPs.get(0));
-		
+		try {	
+			// if there are no rogue APs it throw IndexOutOfBounds Exception
+			EstimateAP.estimateAP(rogueAPs.get(0));
+		}
+		catch (Exception e)	{}
 	}
 
 	public void authAPs()
@@ -594,7 +597,7 @@ public class PaintPane extends JComponent {
 		
 		for (int i = 0; i < PaintPane.Mac.size(); i++)
 		{
-			if (mac.equals(PaintPane.Mac.get(i).getMac()))
+			if (mac.equals(PaintPane.Mac.get(i).getMacAddress()))
 			{
 				return PaintPane.Mac.get(i);
 			}
