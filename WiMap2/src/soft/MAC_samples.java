@@ -9,6 +9,7 @@ public class MAC_samples
 {
 	double RSSI;
 	double X , Y;
+	private boolean isAuth ;
 	private String MacAddress;
 	private String Essid;
 	private ArrayList <sample> sampleArr = new ArrayList <sample> (); //save samples for each Mac address
@@ -81,6 +82,22 @@ public class MAC_samples
 		sampleArr.add(s);
 	}
 	
+	public int getSampleCount()
+	{
+		return sampleArr.size();
+	}
+	
+	public String printSig_X_Y(int i)
+	{
+		String ret = Float.toString(sampleArr.get(i).getSignal())+"," + sampleArr.get(i).getX()+","+sampleArr.get(i).getX();
+		return ret;
+	}
+	
+	public String printAP_X_Y()
+	{
+		return "("+X+"_"+Y+")";
+	}
+	
 	public void setMacAddress(String mac_add)
 	{
 	    if (isValidMac(mac_add)) 
@@ -94,6 +111,11 @@ public class MAC_samples
 		return MacAddress;
 	}
 
+	public String getMac_Address()
+	{
+		return MacAddress.replaceAll(":", "-");
+	}
+
 	public void setESSID(String essid)
 	{
 		Essid = essid; 
@@ -102,5 +124,15 @@ public class MAC_samples
 	public String getESSID()
 	{
 		return Essid;
+	}
+	
+	public void setAsAuthorized()
+	{
+		isAuth = true;
+	}
+	
+	public boolean isAuthorized()
+	{
+		return isAuth ;
 	}
 }

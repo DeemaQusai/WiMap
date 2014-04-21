@@ -7,6 +7,7 @@ import java.awt.event.*;
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
+
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -40,8 +41,8 @@ public class MainWindow extends JPanel {
 		JMenuItem newItem = new JMenuItem("New");
 		newItem.setAccelerator(KeyStroke.getKeyStroke('N', KeyEvent.CTRL_DOWN_MASK));
 		
-		JMenuItem openItem = new JMenuItem("Open");					//create the open
-		openItem.setAccelerator(KeyStroke.getKeyStroke('O', KeyEvent.CTRL_DOWN_MASK));
+		JMenuItem loadItem = new JMenuItem("Load");					//create the open
+		loadItem.setAccelerator(KeyStroke.getKeyStroke('O', KeyEvent.CTRL_DOWN_MASK));
 		
 		final JMenuItem saveItem = new JMenuItem("Save");					//create the save
 		saveItem.setAccelerator(KeyStroke.getKeyStroke('S', KeyEvent.CTRL_DOWN_MASK));
@@ -57,13 +58,13 @@ public class MainWindow extends JPanel {
 		JMenuItem aboutItem = new JMenuItem("About WiMAP");			//create the about 
 
 		newItem.setToolTipText("New project");		//tool tip (on mouse hover)
-		openItem.setToolTipText("Open Floor Plan");		//tool tip (on mouse hover)
+		loadItem.setToolTipText("Open Floor Plan");		//tool tip (on mouse hover)
 		saveItem.setToolTipText("Save Map");			//tool tip (on mouse hover)
 		exit.setToolTipText("Exit application");		//tool tip (on mouse hover)
 		smoothResItem.setToolTipText("Effects speed");		//??
 
 		fileMenu.add(newItem);			//add the new to the "file" menu
-		fileMenu.add(openItem);			//add the open to the "file" menu
+		fileMenu.add(loadItem);			//add the open to the "file" menu
 		fileMenu.add(saveItem);			//add the save to the "file" menu
 		fileMenu.add(exit);				//add the exit to the "file" menu
 		
@@ -91,7 +92,7 @@ public class MainWindow extends JPanel {
 		});
 
 		// OPEN
-		openItem.addActionListener(new ActionListener() {		//action listener for open
+		loadItem.addActionListener(new ActionListener() {		//action listener for open
 			public void actionPerformed(ActionEvent event) {
 				boolean flag = true ;
 				try {
@@ -183,6 +184,7 @@ public class MainWindow extends JPanel {
 
 	public static void openActionPerformed (ActionEvent event)
 	{
+		// ?? all unsaved progress will be lost, would you like to save before you open a new project?
 		panelCanvas.initialize();
 		openImageAction();
 	}
@@ -219,7 +221,7 @@ public class MainWindow extends JPanel {
 			if (saveFC.getFileFilter() instanceof FileNameExtensionFilter) 
 			{
 		        String nameLower = file.getName().toLowerCase();
-		        for (String ext : exts) { // check if it already has a valid extension
+		        for (String ext : exts) { // check if it already has a valid extension	
 		            if (nameLower.endsWith('.' + ext.toLowerCase())) {
 		            	saveImagePath = file.getAbsolutePath(); // 
 		            	flag = false ;
@@ -238,6 +240,7 @@ public class MainWindow extends JPanel {
 				g.dispose();
 				File map = new File(saveImagePath);		//there must be a way
 				ImageIO.write(saving, exts[0], map);
+				saveMacSamples(file.getParent());
 			} catch(IOException exc) {
 				System.out.println("problem saving");
 			}catch (Exception e)
@@ -297,11 +300,34 @@ public class MainWindow extends JPanel {
 
 	}
 
-	public static void saveMacSamples()
+	public static void saveMacSamples(String path)
 	{
 		if (PaintPane.Mac.isEmpty())
 			return ;
 		
+		for (int i = 0; i < PaintPane.Mac.size(); i++)
+		{
+			PrintWriter writer ;		// to write each sample set on a file
+			try {
+				File file = new File(path + "\\Data\\" + PaintPane.Mac.get(i).getMac_Address() +".csv");
+				file.getParentFile().mkdirs();
+				writer = new PrintWriter(file, "UTF-8");
+				writer.println("signal level,X-coordinate,Y-coordinate");	
+
+				for (int j = 0; j < PaintPane.Mac.get(i).getSampleCount(); j++)
+					writer.println(PaintPane.Mac.get(i).printSig_X_Y(j));
+
+				writer.println("ESSID," + PaintPane.Mac.get(i).getESSID());
+				writer.println("Mac Address," + PaintPane.Mac.get(i).getMacAddress());
+				writer.println("AP position," + PaintPane.Mac.get(i).printAP_X_Y());
+				writer.println(PaintPane.Mac.get(i).isAuthorized()?"Authorized":"Rogue");
+				writer.close();
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	/*Add the upper toolbar*/
