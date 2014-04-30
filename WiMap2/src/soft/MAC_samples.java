@@ -105,12 +105,12 @@ public class MAC_samples
 	{
 		sampleArr.add(new sample(sig, x, y));
 	}
-/*
+
 	public void addSample(sample s)
 	{
 		sampleArr.add(s);
 	}
-*/	
+	
 	
 	
 	/*
@@ -197,5 +197,4 @@ public class MAC_samples
 	{
 		return Y;
 	}
-	
 }

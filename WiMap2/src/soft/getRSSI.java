@@ -19,7 +19,7 @@ public class getRSSI {
 	 */
 	public static double readMyFile(String fileName) {
 
-
+		
 		if (fileName == "result.txt") {
 
 			BufferedReader data_is = null;
@@ -40,24 +40,14 @@ public class getRSSI {
 				while ( (record=data_is.readLine()) != null ) {
 
 					color = new Color(0xCC0000);
-
-					if (record.startsWith("Address")) {
+					double level= 0;
+					if (record.contains("Address")) {
 						line = record.substring(9);
 						addrLabel = new JLabel("MAC: " + line);
 
-					} else if (record.startsWith("ESSID")) {
+					} else if (record.contains("ESSID")) {
 						line  = record.substring(6);
 						essidLabel = new JLabel("ESSID: " + line);
-
-					} else if (record.startsWith("RSSI")) {
-						line  = record.substring(5);
-						rssiLabel = new JLabel("Signal Level: " + line + " dBm");
-						double level = Double.parseDouble(line);
-
-						for (int i = 0; i > level; i--){
-							clBrighter = Blend(color, Color.white, (float) 0.98);	//add whiteness according to the RSSI
-							color = clBrighter;
-						}
 						JPanel tempPanel = new JPanel();
 						tempPanel.setLayout(new BoxLayout(tempPanel, BoxLayout.PAGE_AXIS));
 						tempPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
@@ -69,10 +59,19 @@ public class getRSSI {
 
 						MainWindow.av_net_panel.add(tempPanel);
 
+					} else if (record.contains("Signal level=")) {
+						line  = record.substring(5);
+						String[] temp = line.split("Signal level=", 2);
+						rssiLabel = new JLabel("RSSI: " + temp[1]+ " dBm");
+						level = Double.parseDouble(temp[1]);
+						for (int i = 0; i > level; i--){
+							clBrighter = Blend(color, Color.white, (float) 0.98);	//add whiteness according to the RSSI
+							color = clBrighter;
+						}
 					}
-
-
 				}
+				
+				data_is.close();
 			} catch (IOException e) {
 				// catch io errors from FileInputStream or readLine()
 				System.out.println("Uh oh, got an IOException error!" + e.getMessage());
@@ -86,7 +85,6 @@ public class getRSSI {
 					}
 				}
 			}
-
 
 		} else if (fileName == "result2.txt") {
 

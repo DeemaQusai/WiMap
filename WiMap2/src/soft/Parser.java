@@ -28,13 +28,9 @@ public class Parser {
 		
 		try {
 			br = new BufferedReader(new FileReader("result.txt")); 
-		} catch (FileNotFoundException k) {
-			k.printStackTrace();
-		}
-		try {
 			while ((S = br.readLine()) != null) {
 				//Read MAC address line
-				if(S.startsWith("Address:"))
+				if(S.contains("Address:"))
 				{
 					MACAdd = S.substring(9);
 					if (PaintPane.Mac.isEmpty())
@@ -60,15 +56,16 @@ public class Parser {
 							i++;
 						}
 					}
-				}else if (S.startsWith("ESSID")) {
+				}else if (S.contains("ESSID")) {
 					essid  = S.substring(6);
 					PaintPane.Mac.get(n).setESSID(essid);
 
 				}
 				//Read RSSI
-				if(S.startsWith("RSSI"))
+				if(S.contains("RSSI"))
 				{ 
-					RSSI = Float.parseFloat(S.substring(6));
+					String[] temp = S.split("Signal level=", 2);
+					RSSI = Float.parseFloat(temp[1]);
 					//sample s = new sample(RSSI, e.getX(), e.getY());
 					PaintPane.Mac.get(n).addSample(RSSI, e.getX(), e.getY());
 					sigL.add(RSSI);
@@ -76,6 +73,8 @@ public class Parser {
 					MACAdd = "";
 				}
 			}
+		} catch (FileNotFoundException k) {
+			k.printStackTrace();
 		} catch (IOException t) {
 			// TODO Auto-generated catch block
 			t.printStackTrace();

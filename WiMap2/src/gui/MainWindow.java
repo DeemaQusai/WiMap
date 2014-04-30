@@ -1,11 +1,14 @@
 package gui;
 
 import soft.getRSSI;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
+
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -16,6 +19,7 @@ public class MainWindow extends JPanel {
 	public static PaintPane panelCanvas;
 	private static JScrollPane jsp;
 	private static JPanel sidePanel;
+	private static JTabbedPane tb;
 	public static ArrayList<JPanel> av_net_panel = new ArrayList<JPanel> ();
 
 	static JFrame f ;
@@ -212,14 +216,14 @@ public class MainWindow extends JPanel {
 		panelCanvas.initialize();
 		openImageAction();
 	}
-
+/*
 	public static void openActionPerformed (ActionEvent event)
 	{
 		// ?? all unsaved progress will be lost, would you like to save before you open a new project?
 		panelCanvas.initialize();
 		openImageAction();
 	}
-
+*/
 	public static void saveActionPerformed (ActionEvent event)
 	{	
 		if(image == null)
@@ -232,7 +236,7 @@ public class MainWindow extends JPanel {
 		saveFC.setAcceptAllFileFilterUsed(false);
 		//		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("Image Files", "jpg", "png", "tif"));
 
-		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("JPEG", "JPEG"));
+//		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("JPEG", "JPEG"));
 		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("gif", "gif"));
 		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("png", "png"));
 //		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("tif" ,"tif"));
@@ -271,9 +275,9 @@ public class MainWindow extends JPanel {
 				g.dispose();
 				File map = new File(saveImagePath);		//there must be a way
 				ImageIO.write(saving, exts[0], map);
-				panelCanvas.saveMacSamples(file.getParent());
+				panelCanvas.saveMacSamples(file.getParent());	//save the data
 			} catch(IOException exc) {
-				System.out.println("problem saving");
+				exc.printStackTrace();
 			}catch (Exception e)
 			{
 				e.printStackTrace();
@@ -353,12 +357,17 @@ public class MainWindow extends JPanel {
 	/*Add the side panel that displays the scanned networks*/
 	public void addSidePanel()
 	{
+		tb = new JTabbedPane();
+		
 		sidePanel = new JPanel(/*new BorderLayout()*/);
 		sidePanel.setBackground(new Color(windowColor));
 		sidePanel.setName("SidePanel");
 		sidePanel.setPreferredSize(new Dimension(250, f.getHeight()));
 
-		sidePanel.add(new JLabel ("Available Networks:", SwingConstants.LEFT),  BorderLayout.PAGE_START);
+		//sidePanel.add(new JLabel ("Available Networks:", SwingConstants.LEFT),  BorderLayout.PAGE_START);
+		
+		tb.setBackground(new Color(windowColor));
+		tb.setPreferredSize(new Dimension(250, f.getHeight()));
 
 		JButton scanBtn = new JButton("Scan");
 		scanBtn.addActionListener(new ActionListener () {
@@ -370,14 +379,14 @@ public class MainWindow extends JPanel {
 				}
 				av_net_panel.clear();
 
-				/*	String command = "sh scan.sh";
+				String command = "sh scan.sh";
 				try {
 					getRSSI.runShellScript(command);
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
-				}*/
+				}
 				getRSSI.readMyFile("result.txt");
 				for (int i = 0; i < av_net_panel.size(); i++)
 				{
@@ -396,7 +405,38 @@ public class MainWindow extends JPanel {
 		sidePanel.setEnabled(true);
 		sidePanel.setVisible(true);
 
-		add(sidePanel, BorderLayout.WEST);
+		tb.addTab("Available Networks", sidePanel);
+		tb.setEnabled(true);
+		tb.setVisible(true);
+		add(tb, BorderLayout.WEST);
+		
+		//adding the other tab:
+		
+		addAuthAPsTab();
+
+		//add(sidePanel, BorderLayout.WEST);
+	}
+
+	private void addAuthAPsTab() {
+		
+		JPanel authAP_sp = new JPanel();
+		
+		authAP_sp.setBackground(new Color(windowColor));
+		authAP_sp.setName("SidePanel");
+		authAP_sp.setPreferredSize(new Dimension(250, f.getHeight()));
+		
+		JCheckBox chb = new JCheckBox();
+		
+		for(int x = 0; x < PaintPane.authAPs.size(); x++)
+		{
+			String text = "<html>" + PaintPane.authAPs.get(x).getESSID() + "<br>" + PaintPane.authAPs.get(x).getMacAddress() + "</html>";
+			chb.add(new JCheckBox(text));
+			authAP_sp.add(((List<JPanel>) chb).get(x));
+		}
+		
+		authAP_sp.add(chb);
+		
+		tb.addTab("Auth AP's", authAP_sp);
 	}
 
 	public MainWindow() {

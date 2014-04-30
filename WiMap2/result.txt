@@ -1,20 +1,12 @@
-Address: 00:14:7C:A6:CC:C0
-ESSID:"JUST WLAN"
-RSSI: -53 
+Address: 84:51:81:73:85:B3
+RSSI: Quality=57/70 Signal level=-53 
+ESSID:"AndroidAP7746"
 ---------------------------------
-Address: 00:14:7C:A6:DB:80
-ESSID:"JUST WLAN"
-RSSI: -74 
+Address: 00:03:C9:43:2E:3C
+RSSI: Quality=31/70 Signal level=-79 
+ESSID:"qusai"
 ---------------------------------
-Address: 54:E6:FC:BC:9D:B4
-ESSID:"Dr"
-RSSI: -76 
----------------------------------
-Address: A0:F3:C1:7B:CD:84
-ESSID:"Moneer"
-RSSI: -91 
----------------------------------
-Address: 64:D9:89:C5:4F:90
-ESSID:"JUST WLAN"
-RSSI: -89 
+Address: 00:16:41:8F:84:1D
+RSSI: Quality=24/70 Signal level=-86 
+ESSID:"haddad"
 ---------------------------------

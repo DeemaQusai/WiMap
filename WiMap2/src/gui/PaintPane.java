@@ -28,14 +28,12 @@ public class PaintPane extends JComponent {
 	public static ArrayList<sample> mySamples = null;
 	static ArrayList<JLabel> myLabels = null;
 	public static ArrayList <MAC_samples> Mac = new ArrayList<MAC_samples>();
-//	private File file = new File("Mysamples_result.csv");
-//	private BufferedWriter Writer;
 
 	Random random = new Random ();
 	int Max_index =0; //to save the index for AP which has maximum samples;
+	
 	public static ArrayList<MAC_samples> rogueAPs = new ArrayList<MAC_samples>();
 	public static ArrayList<MAC_samples> authAPs = new ArrayList<MAC_samples>();
-
 
 	private static final int DEFAULT_RES = 6;		// the default resolution for smoothing
 	private JButton undoBtn ;
@@ -45,12 +43,16 @@ public class PaintPane extends JComponent {
 	private JTextField sampleCount ;
 
 	private int l = DEFAULT_RES ;
+	private int rectLength = 20;		// for smoothing off
+
 	public double mapScale ;
 	public int AP_x , AP_y;
 	public double   PLE_n =0;			//path loss exponent
 	private int clickCount = 0;
 	private int x1 ,y1 ;
 	private int x2 ,y2 ;
+	public static Boolean AP_here = false;
+
 
 	//need for saving samples
 	int i = 0; // # of distinct MAC address
@@ -100,10 +102,10 @@ public class PaintPane extends JComponent {
 
 				JLabel tryLabel = new JLabel(Integer.toString(mySamples.size()+1));
 
-				for(int n =0 ; n < Parser.sigL.size(); n++)
+				for(int n = 0 ; n < Parser.sigL.size(); n++)
 				{
-					if (n ==0)
-						show = show  + Float.toString(Parser.sigL.get(n));
+					if (n == 0)
+						show = Float.toString(Parser.sigL.get(n));
 					else
 						show = show + "," + Float.toString(Parser.sigL.get(n));
 
@@ -171,7 +173,7 @@ public class PaintPane extends JComponent {
 
 					// now to calculate the scale
 					pixd = distance(x2, y2, x1, y1);
-					System.out.println("click count = " + clickCount + "("+x1+","+y1+") ("+x2+","+y2+")");
+					//System.out.println("click count = " + clickCount + "("+x1+","+y1+") ("+x2+","+y2+")");
 
 					//prompt the user to enter the actual distance in meters
 					try {
@@ -194,7 +196,7 @@ public class PaintPane extends JComponent {
 						JOptionPane.showMessageDialog(null, "Map Scale is (meters : pixels)\n" + 1 + ":" + (pixd/reald)*10/10 );
 						setScale(pixd / reald);//??
 					}
-					System.out.println("Map scale : " + mapScale);
+					//System.out.println("Map scale : " + mapScale);
 
 					clickCount = 0;
 					removeMouseListener(scalingML);		// am done scaling
@@ -225,7 +227,6 @@ public class PaintPane extends JComponent {
 		if (response == JOptionPane.YES_OPTION) {
 			deleteSample(label);
 		}
-
 	}	
 
 	public void openImage (BufferedImage im)
@@ -240,7 +241,6 @@ public class PaintPane extends JComponent {
 		JOptionPane.showMessageDialog(null, "Must determine the map scale before taking samples.\nclick on two points and enter the real distance between them in meters" );
 		smoothBtn.setEnabled(true);
 		doneBtn.setEnabled(true);
-
 	}
 
 	public void paint (Graphics g)
@@ -310,19 +310,39 @@ public class PaintPane extends JComponent {
 			//System.out.println("value(" + x + ") = " + value);
 			}
 
-		}
+		} /*else if (AP_here) {
+			BufferedImage APimage;
+			try {
+				APimage = ImageIO.read(new File("resources/AP.jpg"));
+				g.drawImage(APimage,(int)AP_x-50, (int)AP_y-50, 100, 100, null); //then you can't paint the samples
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			}
+		*/
+
 		else {
+			/*
+			for(int i =0; i<Mac.size();i++)
+			{
+				for (int j=0; j<Mac.get(i).getSampleCount(); j++)
+				{
+					value = (int)(Mac.get(i).getS_RSSI(j)*-1);
+					myColor = getColor (value);
+					g.setColor(myColor); 
+					g.fillRect(Mac.get(i).getS_X(j)-(rectLength/2),Mac.get(i).getS_Y(j)-(rectLength/2), rectLength, rectLength);		//
+				}
+			}
+			*/
+			
 			for (int i = 0; i < mySamples.size() ; i++)
 			{
 				//value = (int)(mySamples.get(i).getSignal()) * -1;		//the strength of the red from the signal level
-
-				for (int j = 0; j < Parser.sigL.size(); j++)		//for all RSSIs at this point
-				{
-					value = (int) ((Parser.sigL.get(j)) * -1);
-					myColor = getColor (value);
-					g.setColor(myColor); 
-					g.fillRect(mySamples.get(i).getX()-10, mySamples.get(i).getY()-10, 20, 20);		//
-				}
+				value = (int) (mySamples.get(i).getSignal() * -1);
+				myColor = getColor (value);
+				g.setColor(myColor); 
+				g.fillRect(mySamples.get(i).getX()-(rectLength/2), mySamples.get(i).getY()-(rectLength/2), rectLength, rectLength);		//
 			}					
 		}
 	}
@@ -339,7 +359,7 @@ public class PaintPane extends JComponent {
 		return ret;
 	}
 
-	public Color getColor (double val)
+	public Color getColor (float val)
 	{	
 		float h = 0.0f; 	//Hue value (changes to give rainbow scale)
 		float s = 0.9f;		//Saturation
@@ -355,9 +375,26 @@ public class PaintPane extends JComponent {
 		//System.out.println("RSSI: " + val + " Color: " + rgb_color);
 
 		return rgb_color;
+		/*
+		float h = 1.89f; 	//Hue value (changes to give rainbow scale)
+		float s = 1.0f;		//Saturation
+		float b = 0.6f;		//Brightness
+
+		for (int i = 20; i < val; i++){
+			b-=0.006;		//increment hue with the decrease of the RSSI
+		}
+
+		int rgbColorCode = Color.HSBtoRGB(h, s, b);		//extract RGB color to add opacity
+		String hex_string = "88" + Integer.toHexString(rgbColorCode).substring(2);	//0x88 is the opacity code 
+		Color rgb_color = new Color((int) Long.parseLong(hex_string, 16), true);
+
+		//System.out.println("RSSI: " + val + " Color: " + rgb_color	);
+
+		return rgb_color;*/
 	}
-/*
-	public float GetRSSI ()	{	// EXECUTE SCRIPT FILE HERE		
+	
+	public float GetRSSI ()	
+	{	// EXECUTE SCRIPT FILE HERE		
 		//In case of 1 AP (the one we're connected to)
 		double RSSI ;
 		try {
@@ -376,7 +413,7 @@ public class PaintPane extends JComponent {
 
 		return (float) RSSI;
 	}
-*/
+
 	public JTextField addSamlpeCount()
 	{
 		sampleCount = new JTextField("Number of samples: " + Integer.toString(mySamples.size()));
@@ -423,12 +460,11 @@ public class PaintPane extends JComponent {
 	public void setAPpos (int x , int y)
 	{
 		AP_x = x;
-		AP_y =y;
+		AP_y = y;
 	}
 
 	public JButton addUndoBtn()
 	{
-
 		ImageIcon undoIcon = new ImageIcon("resources/undoIcon.png");
 		Image img = undoIcon.getImage();  
 		Image newimg = img.getScaledInstance(18, 18, java.awt.Image.SCALE_SMOOTH);  
@@ -459,7 +495,6 @@ public class PaintPane extends JComponent {
 			smoothOn = false ;
 		}
 		sampleCount.setText("Number of samples: " + Integer.toString(mySamples.size()));
-
 	}
 	public JButton addClearBtn()
 	{
@@ -620,6 +655,7 @@ public class PaintPane extends JComponent {
 	public void apPosition()
 	{
 		JOptionPane.showMessageDialog(null, "Click on the location of the Access Point on the map");
+		AP_here = true;		//flag to add AP icon in paint()
 		this.removeMouseListener(samplingML);
 		this.addMouseListener(apPoML);
 	}
@@ -758,7 +794,6 @@ public class PaintPane extends JComponent {
 		 */
 	}
 
-
 	public int getSmoothRes ()
 	{
 		return l;
@@ -793,10 +828,11 @@ public class PaintPane extends JComponent {
 			PrintWriter writer ;		// to write each sample set on a file
 			try {
 				File file = new File(path + "\\Data\\" + Mac.get(i).getMac_Address() +".csv");
-				file.getParentFile().mkdirs();
+				//File file = new File(path + "\\" + Mac.get(i).getMac_Address() +".csv");
+				//file.getParentFile().mkdirs();
 				writer = new PrintWriter(file, "UTF-8");
 
-				writer.println("ESSID," + Mac.get(i).getESSID());
+				writer.println("ESSID," + ((Mac.get(i).getESSID()!=null)?Mac.get(i).getESSID():"null"));
 				writer.println("Mac Address," + Mac.get(i).getMacAddress());
 				writer.println("AP position," + Mac.get(i).printAP_X_Y());
 				writer.println("Authorization,"+(Mac.get(i).isAuthorized()?"Yes":"No"));
@@ -818,34 +854,42 @@ public class PaintPane extends JComponent {
 	{
 		Scanner scanner;
 		try {
-			clear();
-			for(File f : files)
+
+			for(int filenum = 0 ; filenum < files.length ; filenum++)
 			{
-				scanner = new Scanner(f);
+				scanner = new Scanner(files[filenum]);
 				String line;			
 				String [] temp = new String[3];
 
 				line = scanner.nextLine();		//	ESSID
-				temp = line.split(",",2);
+				temp = line.split(",",3);
 				String essid = temp[1];
 
 				line = scanner.nextLine();		//	Mac Address
-				temp = line.split(",",2);
+				temp = line.split(",",3);
 				String macAdd = temp[1];
+				System.out.println(macAdd);
 
 				line = scanner.nextLine();		//	AP position
-				temp = line.split("," ,3);
+				temp = line.split("," ,4);
 				int x = Integer.parseInt(temp[1]);
 				int y = Integer.parseInt(temp[2]);
+				System.out.println("("+x+","+y+")");
 
 				line = scanner.nextLine();		//	Authorisation
-				temp = line.split(",",2);
+				temp = line.split(",",3);
 				Boolean auth ;
 				if ("Yes".equalsIgnoreCase(temp[1]))
+				{
+					System.out.println("AUTH");
 					auth = true;
+				}
 				else
+				{
+					System.out.println("ROGU");
 					auth = false;
-				
+				}
+
 				Mac.add(new MAC_samples(essid, macAdd, auth, x,y));
 
 				scanner.nextLine();		//skip the header of the file
@@ -853,13 +897,15 @@ public class PaintPane extends JComponent {
 				{
 					line = scanner.nextLine();
 					temp = line.split(",");
-					Mac.get(Mac.size()-1).addSample(Float.parseFloat(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
+					sample s = new sample(Float.parseFloat(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
+					mySamples.add(s);
+					Mac.get(Mac.size()-1).addSample(s);
 				}
 
 				scanner.close();
 			}
 
-		} catch (FileNotFoundException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -932,7 +978,7 @@ public class PaintPane extends JComponent {
 		double gaussian;
 
 		/***************************************************/
-	/*	double nextNextGaussian;
+		/*	double nextNextGaussian;
 		//boolean haveNextNextGaussian = false;
 		double v1, v2, s;
 		double multiplier;
