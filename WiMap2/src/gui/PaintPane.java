@@ -11,12 +11,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
-//import java.util.Random;
+import java.util.Random;
+import java.util.Scanner;
 
 import javax.swing.*;
 
@@ -28,9 +28,11 @@ public class PaintPane extends JComponent {
 	public static ArrayList<sample> mySamples = null;
 	static ArrayList<JLabel> myLabels = null;
 	public static ArrayList <MAC_samples> Mac = new ArrayList<MAC_samples>();
-	private File file = new File("Mysamples_result.csv");
-	private BufferedWriter Writer;
+//	private File file = new File("Mysamples_result.csv");
+//	private BufferedWriter Writer;
 
+	Random random = new Random ();
+	int Max_index =0; //to save the index for AP which has maximum samples;
 	public static ArrayList<MAC_samples> rogueAPs = new ArrayList<MAC_samples>();
 	public static ArrayList<MAC_samples> authAPs = new ArrayList<MAC_samples>();
 
@@ -44,7 +46,7 @@ public class PaintPane extends JComponent {
 
 	private int l = DEFAULT_RES ;
 	public double mapScale ;
-	public double AP_x , AP_y;
+	public int AP_x , AP_y;
 	public double   PLE_n =0;			//path loss exponent
 	private int clickCount = 0;
 	private int x1 ,y1 ;
@@ -209,8 +211,8 @@ public class PaintPane extends JComponent {
 	public void initialize ()
 	{
 		setLayout(null);
-		this.removeMouseListener(samplingML);	// opened a new image so stop the sample taking
-		this.addMouseListener(scalingML);		// need to take scale first.
+		removeMouseListener(samplingML);	// opened a new image so stop the sample taking
+		addMouseListener(scalingML);		// need to take scale first.
 		clear();
 	}
 
@@ -310,12 +312,17 @@ public class PaintPane extends JComponent {
 
 		}
 		else {
-			for (int i=0; i<mySamples.size() ; i++)
+			for (int i = 0; i < mySamples.size() ; i++)
 			{
-				value = (int)(mySamples.get(i).getSignal()) * -1;		//the strength of the red from the signal level
-				myColor = getColor (value);
-				g.setColor(myColor); 
-				g.fillRect(mySamples.get(i).getX()-10, mySamples.get(i).getY()-10, 20, 20);		//
+				//value = (int)(mySamples.get(i).getSignal()) * -1;		//the strength of the red from the signal level
+
+				for (int j = 0; j < Parser.sigL.size(); j++)		//for all RSSIs at this point
+				{
+					value = (int) ((Parser.sigL.get(j)) * -1);
+					myColor = getColor (value);
+					g.setColor(myColor); 
+					g.fillRect(mySamples.get(i).getX()-10, mySamples.get(i).getY()-10, 20, 20);		//
+				}
 			}					
 		}
 	}
@@ -413,7 +420,7 @@ public class PaintPane extends JComponent {
 		return 1;
 	}
 
-	public void setAPpos (double x , double y)
+	public void setAPpos (int x , int y)
 	{
 		AP_x = x;
 		AP_y =y;
@@ -576,6 +583,9 @@ public class PaintPane extends JComponent {
 			EstimateAP.estimateAP(rogueAPs.get(0));
 		}
 		catch (Exception e)	{}
+	
+		double guassianVar = Find_Gaussian();
+		System.out.println(guassianVar);
 	}
 
 	public void authAPs()
@@ -616,7 +626,80 @@ public class PaintPane extends JComponent {
 
 	public void compute_n ()
 	{
+		/*
+				file.createNewFile();
+
+				Writer = new BufferedWriter(new FileWriter(file));
+				Writer.write("RSSI"+"," +"X"+","+"Y" );
+				Writer.newLine();
+
+				for(int i =0 ; i < mySamples.size(); i++)
+				{
+					Writer.write(mySamples.get(i).getSignal() +"," + mySamples.get(i).getX() + ","+mySamples.get(i).getY());
+					Writer.newLine();
+
+				}
+				Writer.newLine();
+				Writer.flush();
+				Writer.close();
+		 */
+		ArrayList<Double> log_d = new ArrayList<Double>();
+		Double distance = 0.0;
+		int j =0 ;
+		int max = Mac.get(0).getSampleCount();
+
+
+		//To find AP which has largest number of samples***********
+		for (int a =1 ; a < Mac.size(); a++)
+		{
+			if ( Mac.get(a).getSampleCount() > max)
+			{
+				max = Mac.get(a).getSampleCount();
+				Max_index = a;
+			}
+		}
+		/*****************************************************************************************/
+		while ( j < Mac.get(Max_index).getSampleCount())
+		{
+			distance = Math.sqrt(Math.pow((Math.abs(Mac.get(Max_index).getS_X(j)-AP_x)),2) +  Math.pow((Math.abs(Mac.get(Max_index).getS_Y(j)-AP_y)),2))/mapScale;
+			log_d.add(10*(Math.log10(distance))); 
+			distance = 0.0;
+			j++;
+		} 
+
+		// Computing slope 
+		int s0 = 0;
+		Double s1 = 0.0 , s2 = 0.0, t1 =0.0 , t2 = 0.0;
+		Double M = 0.0 ;//, B = 0.0 ;
+
+		for (int n=0 ; n < Mac.get(Max_index).getSampleCount() ; n++ )
+		{
+			s0++;
+			if (Mac.get(Max_index).getS_X(n) == AP_x && Mac.get(Max_index).getS_Y(n) == AP_y)
+			{
+				t1 = t1+ Mac.get(Max_index).getS_RSSI(n);
+				continue;
+			}
+			s1 = s1+ log_d.get(n);
+			s2 = s2 + (log_d.get(n)* log_d.get(n));
+			t1 = t1+ Mac.get(Max_index).getS_RSSI(n);
+			t2 = t2 + (log_d.get(n) * Mac.get(Max_index).getS_RSSI(n));
+		}
+
+		M = ( s0*t2 - s1*t1 ) / (s0*s2 - s1*s1);
+		//B = ( s2*t1 - s1*t2 ) / (s0*s2 - s1*s1);
+		PLE_n = Math.abs(M);
+		JOptionPane.showMessageDialog(null, "Path loss exponent (n) = "+ PLE_n );
+
+
+		/*
 		try {
+
+			FileOutputStream fout= new FileOutputStream ("mac samples test");
+			ObjectOutputStream oos = new ObjectOutputStream(fout);
+			oos.writeObject(Parser.MAC_samples);
+			fout.close();
+
 			file.createNewFile();
 
 			Writer = new BufferedWriter(new FileWriter(file));
@@ -672,7 +755,9 @@ public class PaintPane extends JComponent {
 		//B = ( s2*t1 - s1*t2 ) / (s0*s2 - s1*s1);
 		PLE_n = Math.abs(M);
 		JOptionPane.showMessageDialog(null, "Path loss exponent (n) = "+ PLE_n );
+		 */
 	}
+
 
 	public int getSmoothRes ()
 	{
@@ -697,6 +782,180 @@ public class PaintPane extends JComponent {
 			return true;
 		}
 	}
+
+	public void saveMacSamples(String path)
+	{
+		if (Mac.isEmpty())
+			return ;
+		
+		for (int i = 0; i < Mac.size(); i++)
+		{
+			PrintWriter writer ;		// to write each sample set on a file
+			try {
+				File file = new File(path + "\\Data\\" + Mac.get(i).getMac_Address() +".csv");
+				file.getParentFile().mkdirs();
+				writer = new PrintWriter(file, "UTF-8");
+
+				writer.println("ESSID," + Mac.get(i).getESSID());
+				writer.println("Mac Address," + Mac.get(i).getMacAddress());
+				writer.println("AP position," + Mac.get(i).printAP_X_Y());
+				writer.println("Authorization,"+(Mac.get(i).isAuthorized()?"Yes":"No"));
+				
+				writer.println("signal level,X-coordinate,Y-coordinate");	
+				for (int j = 0; j < Mac.get(i).getSampleCount(); j++)
+					writer.println(Mac.get(i).printSig_X_Y(j));
+
+				writer.close();
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void fillSample (File[] files)
+	{
+		Scanner scanner;
+		try {
+			clear();
+			for(File f : files)
+			{
+				scanner = new Scanner(f);
+				String line;			
+				String [] temp = new String[3];
+
+				line = scanner.nextLine();		//	ESSID
+				temp = line.split(",",2);
+				String essid = temp[1];
+
+				line = scanner.nextLine();		//	Mac Address
+				temp = line.split(",",2);
+				String macAdd = temp[1];
+
+				line = scanner.nextLine();		//	AP position
+				temp = line.split("," ,3);
+				int x = Integer.parseInt(temp[1]);
+				int y = Integer.parseInt(temp[2]);
+
+				line = scanner.nextLine();		//	Authorisation
+				temp = line.split(",",2);
+				Boolean auth ;
+				if ("Yes".equalsIgnoreCase(temp[1]))
+					auth = true;
+				else
+					auth = false;
+				
+				Mac.add(new MAC_samples(essid, macAdd, auth, x,y));
+
+				scanner.nextLine();		//skip the header of the file
+				while (scanner.hasNextLine()) 
+				{
+					line = scanner.nextLine();
+					temp = line.split(",");
+					Mac.get(Mac.size()-1).addSample(Float.parseFloat(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
+				}
+
+				scanner.close();
+			}
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		undoBtn.setEnabled(true);
+		clearBtn.setEnabled(true);
+		smoothBtn.setEnabled(true);
+		sampleCount.setText("Number of samples: " + Integer.toString(mySamples.size()));
+		repaint();
+
+		for (int i = 0 ; i < Mac.size(); i++)
+		{
+			System.out.println(Mac.get(i).getESSID());
+			System.out.println(Mac.get(i).getMacAddress());
+			System.out.println("("+Mac.get(i).printAP_X_Y()+")");
+			System.out.println(Mac.get(i).isAuthorized()?"YEAH":"NOPE");
+			System.out.println();
+		}
+
+	}
+	
+
+	public double Find_Gaussian ()
+	{
+		double Result;
+		double min =0;
+		double d0;
+		double J_n =0;
+		double sigma;
+		float P_d0;
+		int j=0;
+
+		ArrayList <Double> distance_M = new ArrayList<Double>();
+		ArrayList <Float> computed_P = new ArrayList<Float>();
+		ArrayList <Float> calculated_P = new ArrayList<Float>();
+		System.out.println(Mac.get(Max_index).getSampleCount());
+
+
+		//to calculate distance for each sample related to AP position (meters).
+		for (int i =0; i < Mac.get(Max_index).getSampleCount() ; i++)
+		{
+			Result = distance(AP_x, AP_y, Mac.get(Max_index).getS_X(i), Mac.get(Max_index).getS_Y(i)) /mapScale;
+			distance_M.add(Result);
+			computed_P.add(Mac.get(Max_index).getS_RSSI(i));
+			if(i == 0)
+			{
+				min = Result;
+				j=i;
+			}
+			else
+				if (Result < min)
+				{
+					min = Result;
+					j=i;
+				}
+		}
+
+		d0 = min;
+		P_d0 = Mac.get(Max_index).getS_RSSI(i);
+
+
+		//Calculate J(n) to Find sigmaa
+		for (int n =0 ; n < distance_M.size() ; n++)
+		{
+			calculated_P.add((float)(0 - (10* PLE_n * Math.log10(distance_M.get(n)/ d0))));
+			J_n = J_n + Math.pow( (computed_P.get(n) - calculated_P.get(n)) ,2);
+		}
+		sigma = Math.sqrt(J_n / distance_M.size());
+		System.out.println(sigma);
+		double gaussian;
+
+		/***************************************************/
+	/*	double nextNextGaussian;
+		//boolean haveNextNextGaussian = false;
+		double v1, v2, s;
+		double multiplier;
+		
+		
+		do {
+			v1 = 2 * random.nextDouble()- sigma;     
+			v2 = 2 * random.nextDouble() - sigma;    
+
+			s = v1 * v1 + v2 * v2;
+			System.out.println(v1 + " " + v2+ " " + s);
+		} while (s >= 1 || s == 0 ); //while ( );
+
+		
+		multiplier = StrictMath.sqrt(-2 * StrictMath.log(s)/s);
+		nextNextGaussian = v2 * multiplier;
+		//haveNextNextGaussian = true;   
+		gaussian = v1 * multiplier;
+		System.out.println("gaussian :" + gaussian);*/
+		gaussian = random.nextGaussian() * sigma;
+		return gaussian;
+		//H_APs();
+	} //End Find_Gaussin
 
 }	// end of class
 

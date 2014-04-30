@@ -1,13 +1,11 @@
 package gui;
 
 import soft.getRSSI;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
-
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -40,10 +38,12 @@ public class MainWindow extends JPanel {
 
 		JMenuItem newItem = new JMenuItem("New");
 		newItem.setAccelerator(KeyStroke.getKeyStroke('N', KeyEvent.CTRL_DOWN_MASK));
-		
+/*		
 		JMenuItem loadItem = new JMenuItem("Load");					//create the open
 		loadItem.setAccelerator(KeyStroke.getKeyStroke('O', KeyEvent.CTRL_DOWN_MASK));
-		
+*/		
+		JMenuItem opentext = new JMenuItem("Load Data");					//del
+
 		final JMenuItem saveItem = new JMenuItem("Save");					//create the save
 		saveItem.setAccelerator(KeyStroke.getKeyStroke('S', KeyEvent.CTRL_DOWN_MASK));
 		
@@ -58,13 +58,14 @@ public class MainWindow extends JPanel {
 		JMenuItem aboutItem = new JMenuItem("About WiMAP");			//create the about 
 
 		newItem.setToolTipText("New project");		//tool tip (on mouse hover)
-		loadItem.setToolTipText("Open Floor Plan");		//tool tip (on mouse hover)
+//		loadItem.setToolTipText("Open Floor Plan");		//tool tip (on mouse hover)
 		saveItem.setToolTipText("Save Map");			//tool tip (on mouse hover)
 		exit.setToolTipText("Exit application");		//tool tip (on mouse hover)
 		smoothResItem.setToolTipText("Effects speed");		//??
 
 		fileMenu.add(newItem);			//add the new to the "file" menu
-		fileMenu.add(loadItem);			//add the open to the "file" menu
+//		fileMenu.add(loadItem);			//add the open to the "file" menu
+		fileMenu.add(opentext);		
 		fileMenu.add(saveItem);			//add the save to the "file" menu
 		fileMenu.add(exit);				//add the exit to the "file" menu
 		
@@ -92,7 +93,7 @@ public class MainWindow extends JPanel {
 		});
 
 		// OPEN
-		loadItem.addActionListener(new ActionListener() {		//action listener for open
+/*		loadItem.addActionListener(new ActionListener() {		//action listener for open
 			public void actionPerformed(ActionEvent event) {
 				boolean flag = true ;
 				try {
@@ -105,8 +106,20 @@ public class MainWindow extends JPanel {
 				saveItem.setEnabled(flag);
 			}
 		});
+*/
+		opentext.addActionListener(new ActionListener() {		//action listener for open
+			public void actionPerformed(ActionEvent event) {
+				boolean flag = true ;
+				try {
 
-		// SAVE
+					loadtextActionPerformed (event);
+				} catch (Exception e)
+				{
+					flag = false ;
+				}
+				saveItem.setEnabled(flag);
+			}
+		});		// SAVE
 		saveItem.addActionListener(new ActionListener() {		//action listener for open
 			public void actionPerformed(ActionEvent event) {
 				saveActionPerformed (event);
@@ -152,6 +165,13 @@ public class MainWindow extends JPanel {
 		smoothResItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				try {
+					resolutionDialog dialog = new resolutionDialog(panelCanvas);
+					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					dialog.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+/*try {
 					String input = JOptionPane.showInputDialog(null, "Enter size of square in pixels", ""); // ??
 					if (panelCanvas.setSmoothRes(Integer.parseInt(input)))
 						JOptionPane.showMessageDialog(null, "New smooth Resolution : " + panelCanvas.getSmoothRes());
@@ -161,7 +181,7 @@ public class MainWindow extends JPanel {
 				catch (Exception e)
 				{
 					e.printStackTrace();
-				}
+				}*/
 
 			}
 		});
@@ -176,6 +196,17 @@ public class MainWindow extends JPanel {
 		return menuBarUpper ;
 	}
 
+	public static void loadtextActionPerformed (ActionEvent event)
+	{
+		String userhome = System.getProperty("user.dir");
+		JFileChooser loadtextFC = new JFileChooser(userhome);
+		loadtextFC.setMultiSelectionEnabled(true);
+		loadtextFC.showOpenDialog(jsp);		//open the dialog box in a jscrollpane
+		File[] files = loadtextFC.getSelectedFiles();
+		
+		panelCanvas.fillSample(files);
+	}
+	
 	public static void newActionPerformed (ActionEvent event)
 	{
 		panelCanvas.initialize();
@@ -201,7 +232,7 @@ public class MainWindow extends JPanel {
 		saveFC.setAcceptAllFileFilterUsed(false);
 		//		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("Image Files", "jpg", "png", "tif"));
 
-		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("jpg", "jpg"));
+		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("JPEG", "JPEG"));
 		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("gif", "gif"));
 		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("png", "png"));
 //		saveFC.addChoosableFileFilter(new FileNameExtensionFilter("tif" ,"tif"));
@@ -240,7 +271,7 @@ public class MainWindow extends JPanel {
 				g.dispose();
 				File map = new File(saveImagePath);		//there must be a way
 				ImageIO.write(saving, exts[0], map);
-				saveMacSamples(file.getParent());
+				panelCanvas.saveMacSamples(file.getParent());
 			} catch(IOException exc) {
 				System.out.println("problem saving");
 			}catch (Exception e)
@@ -298,36 +329,6 @@ public class MainWindow extends JPanel {
 			f.setLocationRelativeTo(null);
 		}
 
-	}
-
-	public static void saveMacSamples(String path)
-	{
-		if (PaintPane.Mac.isEmpty())
-			return ;
-		
-		for (int i = 0; i < PaintPane.Mac.size(); i++)
-		{
-			PrintWriter writer ;		// to write each sample set on a file
-			try {
-				File file = new File(path + "\\Data\\" + PaintPane.Mac.get(i).getMac_Address() +".csv");
-				file.getParentFile().mkdirs();
-				writer = new PrintWriter(file, "UTF-8");
-				writer.println("signal level,X-coordinate,Y-coordinate");	
-
-				for (int j = 0; j < PaintPane.Mac.get(i).getSampleCount(); j++)
-					writer.println(PaintPane.Mac.get(i).printSig_X_Y(j));
-
-				writer.println("ESSID," + PaintPane.Mac.get(i).getESSID());
-				writer.println("Mac Address," + PaintPane.Mac.get(i).getMacAddress());
-				writer.println("AP position," + PaintPane.Mac.get(i).printAP_X_Y());
-				writer.println(PaintPane.Mac.get(i).isAuthorized()?"Authorized":"Rogue");
-				writer.close();
-
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 	}
 	
 	/*Add the upper toolbar*/

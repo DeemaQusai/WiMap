@@ -85,6 +85,12 @@ public class sample implements Comparator<sample> {
 		y = newY ;
 		return y ;
 	}
+	
+	public String toString ()
+	{
+		String temp =Float.toString(signal)+","+x+","+y ; 
+		return temp;
+	}
 	/*
 	public Boolean isAP()
 	{

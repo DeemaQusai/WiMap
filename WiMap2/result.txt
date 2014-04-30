@@ -1,8 +1,20 @@
-Address: 00:90:D0:EC:67:C6
-ESSID:"SpeedTouchFB4E32"
-RSSI: -35 
+Address: 00:14:7C:A6:CC:C0
+ESSID:"JUST WLAN"
+RSSI: -53 
 ---------------------------------
-Address: 4C:09:B4:07:CF:F0
-ESSID:"riziq"
-RSSI: -86 
+Address: 00:14:7C:A6:DB:80
+ESSID:"JUST WLAN"
+RSSI: -74 
+---------------------------------
+Address: 54:E6:FC:BC:9D:B4
+ESSID:"Dr"
+RSSI: -76 
+---------------------------------
+Address: A0:F3:C1:7B:CD:84
+ESSID:"Moneer"
+RSSI: -91 
+---------------------------------
+Address: 64:D9:89:C5:4F:90
+ESSID:"JUST WLAN"
+RSSI: -89 
 ---------------------------------

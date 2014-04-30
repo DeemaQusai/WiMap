@@ -19,6 +19,7 @@ public class Parser {
 
 	public static void parseMultiAP(MouseEvent e)
 	{
+		sigL.clear();
 		String S = "";
 		String MACAdd = "";
 		String essid = "";
@@ -68,8 +69,8 @@ public class Parser {
 				if(S.startsWith("RSSI"))
 				{ 
 					RSSI = Float.parseFloat(S.substring(6));
-					sample s = new sample(RSSI, e.getX(), e.getY());
-					PaintPane.Mac.get(n).addSample(s);
+					//sample s = new sample(RSSI, e.getX(), e.getY());
+					PaintPane.Mac.get(n).addSample(RSSI, e.getX(), e.getY());
 					sigL.add(RSSI);
 					n=0;
 					MACAdd = "";
