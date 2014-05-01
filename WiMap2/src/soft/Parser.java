@@ -25,14 +25,15 @@ public class Parser {
 		String essid = "";
 		float RSSI = 0;
 		BufferedReader br = null;
-		
+		String[] temp ;
 		try {
 			br = new BufferedReader(new FileReader("result.txt")); 
 			while ((S = br.readLine()) != null) {
 				//Read MAC address line
 				if(S.contains("Address:"))
 				{
-					MACAdd = S.substring(9);
+					temp = S.split("Address:", 2);
+					MACAdd = temp[1];
 					if (PaintPane.Mac.isEmpty())
 					{
 						MAC_samples M = new MAC_samples(MACAdd);
@@ -57,14 +58,16 @@ public class Parser {
 						}
 					}
 				}else if (S.contains("ESSID")) {
-					essid  = S.substring(6);
+					temp = S.split("ESSID:\"",2);
+					temp = temp[1].split("\"",2);
+					essid  = temp[0];
 					PaintPane.Mac.get(n).setESSID(essid);
 
 				}
 				//Read RSSI
 				if(S.contains("RSSI"))
 				{ 
-					String[] temp = S.split("Signal level=", 2);
+					temp = S.split("Signal level=", 2);
 					RSSI = Float.parseFloat(temp[1]);
 					//sample s = new sample(RSSI, e.getX(), e.getY());
 					PaintPane.Mac.get(n).addSample(RSSI, e.getX(), e.getY());

@@ -36,41 +36,59 @@ public class getRSSI {
 				JLabel rssiLabel = new JLabel();
 				Color color = new Color(0xCC0000);
 				Color clBrighter = new Color (0);
-
+				String[] temp ; //for parsing (.split)
+				String ESSID = null;
+				JPanel tempPanel =null;
 				while ( (record=data_is.readLine()) != null ) {
 
 					color = new Color(0xCC0000);
 					double level= 0;
-					if (record.contains("Address")) {
-						line = record.substring(9);
-						addrLabel = new JLabel("MAC: " + line);
-
-					} else if (record.contains("ESSID")) {
-						line  = record.substring(6);
-						essidLabel = new JLabel("ESSID: " + line);
-						JPanel tempPanel = new JPanel();
+					if (record.contains("Cell ") && !record.contains("Cell 01"))
+					{
+						tempPanel = new JPanel();
 						tempPanel.setLayout(new BoxLayout(tempPanel, BoxLayout.PAGE_AXIS));
 						tempPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 						tempPanel.setBackground(clBrighter);
 
-						tempPanel.add(essidLabel);
+						tempPanel.add(new JLabel("ESSID: " + ESSID));
 						tempPanel.add(addrLabel);
 						tempPanel.add(rssiLabel);
-
+						ESSID = null ;
 						MainWindow.av_net_panel.add(tempPanel);
+					}
+					if (record.contains("Address")) {
+						temp = record.split("Address:",2);
+						addrLabel = new JLabel("MAC: " + temp[1]);
+
+					} else if (record.contains("ESSID")) {
+						temp = record.split("ESSID:\"",2);
+						temp = temp[1].split("\"",2);
+						ESSID = temp[0];
+//						essidLabel = new JLabel("ESSID: " + temp[0]);
 
 					} else if (record.contains("Signal level=")) {
-						line  = record.substring(5);
-						String[] temp = line.split("Signal level=", 2);
-						rssiLabel = new JLabel("RSSI: " + temp[1]+ " dBm");
-						level = Double.parseDouble(temp[1]);
+						temp = record.split("Signal level=", 2);
+						temp = temp[1].split(" ",2);
+						rssiLabel = new JLabel("RSSI: " + temp[0]+ " dBm");
+						level = Double.parseDouble(temp[0]);
+						System.out.println("THIS RSSI: : "+level);
 						for (int i = 0; i > level; i--){
 							clBrighter = Blend(color, Color.white, (float) 0.98);	//add whiteness according to the RSSI
 							color = clBrighter;
 						}
 					}
 				}
-				
+				tempPanel = new JPanel();
+				tempPanel.setLayout(new BoxLayout(tempPanel, BoxLayout.PAGE_AXIS));
+				tempPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+				tempPanel.setBackground(clBrighter);
+
+				tempPanel.add(new JLabel("ESSID: " + ESSID));
+				tempPanel.add(addrLabel);
+				tempPanel.add(rssiLabel);
+
+				MainWindow.av_net_panel.add(tempPanel);
+
 				data_is.close();
 			} catch (IOException e) {
 				// catch io errors from FileInputStream or readLine()

@@ -1,12 +1,101 @@
-Address: 84:51:81:73:85:B3
-RSSI: Quality=57/70 Signal level=-53 
-ESSID:"AndroidAP7746"
----------------------------------
-Address: 00:03:C9:43:2E:3C
-RSSI: Quality=31/70 Signal level=-79 
+wlan0 Scan completed :
+Cell 01 - Address: 00:03:C9:43:2E:3C
+Channel:10
+Frequency:2.457 GHz (Channel 10)
+Quality=53/70 Signal level=-57 dBm
+Encryption key:on
 ESSID:"qusai"
----------------------------------
-Address: 00:16:41:8F:84:1D
-RSSI: Quality=24/70 Signal level=-86 
-ESSID:"haddad"
----------------------------------
+Bit Rates:1 Mb/s; 2 Mb/s; 5.5 Mb/s; 11 Mb/s
+Bit Rates:6 Mb/s; 9 Mb/s; 12 Mb/s; 18 Mb/s; 24 Mb/s
+36 Mb/s; 48 Mb/s; 54 Mb/s
+Mode:Master
+Extra:tsf=00000002d68b9758
+Extra: Last beacon: 32ms ago
+IE: Unknown: 00057175736169
+IE: Unknown: 010482848B96
+IE: Unknown: 03010A
+IE: Unknown: 2A0104
+IE: Unknown: 2F0104
+IE: Unknown: 32080C1218243048606C
+IE: Unknown: DD06001018020010
+IE: WPA Version 1
+Group Cipher : TKIP
+Pairwise Ciphers (2) : CCMP TKIP
+Authentication Suites (1) : PSK
+Cell 02 - Address: 94:D7:71:2E:D7:C9
+Channel:6
+Frequency:2.437 GHz (Channel 6)
+Quality=70/70 Signal level=-30 dBm
+Encryption key:on
+ESSID:"AndroidAP"
+Bit Rates:1 Mb/s; 2 Mb/s; 5.5 Mb/s; 6 Mb/s; 9 Mb/s
+11 Mb/s; 12 Mb/s; 18 Mb/s
+Bit Rates:24 Mb/s; 36 Mb/s; 48 Mb/s; 54 Mb/s
+Mode:Master
+Extra:tsf=00000000951a5180
+Extra: Last beacon: 1740ms ago
+IE: Unknown: 0009416E64726F69644150
+IE: Unknown: 010882848B0C12961824
+IE: Unknown: 030106
+IE: Unknown: 0706555320010B1B
+IE: Unknown: 2A0100
+IE: Unknown: 32043048606C
+IE: IEEE 802.11i/WPA2 Version 1
+Group Cipher : CCMP
+Pairwise Ciphers (1) : CCMP
+Authentication Suites (1) : PSK
+IE: Unknown: DD180050F2020101800003A4000027A4000042435E0062322F00
+Cell 03 - Address: 00:1A:6B:AA:E6:95
+Channel:10
+Frequency:2.457 GHz (Channel 10)
+Quality=17/70 Signal level=-93 dBm
+Encryption key:on
+ESSID:"shamekh"
+Bit Rates:1 Mb/s; 2 Mb/s; 5.5 Mb/s; 11 Mb/s
+Bit Rates:6 Mb/s; 9 Mb/s; 12 Mb/s; 18 Mb/s; 24 Mb/s
+36 Mb/s; 48 Mb/s; 54 Mb/s
+Mode:Master
+Extra:tsf=00000058cf843185
+Extra: Last beacon: 2352ms ago
+IE: Unknown: 00077368616D656B68
+IE: Unknown: 010482848B96
+IE: Unknown: 03010A
+IE: Unknown: 0505010300C001
+IE: Unknown: 2A0104
+IE: Unknown: 2F0104
+IE: Unknown: 32080C1218243048606C
+IE: Unknown: DD06001018020110
+IE: WPA Version 1
+Group Cipher : TKIP
+Pairwise Ciphers (2) : CCMP TKIP
+Authentication Suites (1) : PSK
+Cell 04 - Address: 00:24:A1:75:7A:41
+Channel:6
+Frequency:2.437 GHz (Channel 6)
+Quality=21/70 Signal level=-89 dBm
+Encryption key:on
+ESSID:"majd"
+Bit Rates:1 Mb/s; 2 Mb/s; 5.5 Mb/s; 6 Mb/s; 9 Mb/s
+11 Mb/s; 12 Mb/s; 18 Mb/s
+Bit Rates:24 Mb/s; 36 Mb/s; 48 Mb/s; 54 Mb/s
+Mode:Master
+Extra:tsf=00000006e5d63388
+Extra: Last beacon: 2012ms ago
+IE: Unknown: 00046D616A64
+IE: Unknown: 010882848B0C12961824
+IE: Unknown: 030106
+IE: Unknown: 200100
+IE: IEEE 802.11i/WPA2 Version 1
+Group Cipher : TKIP
+Pairwise Ciphers (2) : CCMP TKIP
+Authentication Suites (1) : PSK
+IE: WPA Version 1
+Group Cipher : TKIP
+Pairwise Ciphers (2) : CCMP TKIP
+Authentication Suites (1) : PSK
+IE: Unknown: 2A0100
+IE: Unknown: 32043048606C
+IE: Unknown: DD0900037F01010000FF7F
+IE: Unknown: DD0A00037F04010010000000
+IE: Unknown: 0706555320010B1B
+
