@@ -834,9 +834,9 @@ public class PaintPane extends JComponent {
 
 				writer.println("ESSID," + ((Mac.get(i).getESSID()!=null)?Mac.get(i).getESSID():"null"));
 				writer.println("Mac Address," + Mac.get(i).getMacAddress());
+				writer.println("Channel," + Mac.get(i).getChannel());
 				writer.println("AP position," + Mac.get(i).printAP_X_Y());
 				writer.println("Authorization,"+(Mac.get(i).isAuthorized()?"Yes":"No"));
-				
 				writer.println("signal level,X-coordinate,Y-coordinate");	
 				for (int j = 0; j < Mac.get(i).getSampleCount(); j++)
 					writer.println(Mac.get(i).printSig_X_Y(j));
@@ -870,6 +870,10 @@ public class PaintPane extends JComponent {
 				String macAdd = temp[1];
 				System.out.println(macAdd);
 
+				line = scanner.nextLine();		//	Channel
+				temp = line.split(",",3);
+				int chnl = Integer.parseInt(temp[1]);
+
 				line = scanner.nextLine();		//	AP position
 				temp = line.split("," ,4);
 				int x = Integer.parseInt(temp[1]);
@@ -890,7 +894,7 @@ public class PaintPane extends JComponent {
 					auth = false;
 				}
 
-				Mac.add(new MAC_samples(essid, macAdd, auth, x,y));
+				Mac.add(new MAC_samples(essid, macAdd, chnl, auth, x,y));
 
 				scanner.nextLine();		//skip the header of the file
 				while (scanner.hasNextLine()) 

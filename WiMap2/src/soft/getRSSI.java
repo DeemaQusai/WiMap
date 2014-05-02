@@ -18,7 +18,6 @@ public class getRSSI {
 	 * @wbp.parser.entryPoint
 	 */
 	public static double readMyFile(String fileName) {
-
 		
 		if (fileName == "result.txt") {
 
@@ -29,10 +28,9 @@ public class getRSSI {
 				FileInputStream file_is = new FileInputStream(f);
 				InputStreamReader buffered_is = new InputStreamReader(file_is);
 				data_is = new BufferedReader(buffered_is); 
-				String line = "";
 
 				JLabel addrLabel = new JLabel();
-				JLabel essidLabel = new JLabel();
+				JLabel chanlLabel = new JLabel();
 				JLabel rssiLabel = new JLabel();
 				Color color = new Color(0xCC0000);
 				Color clBrighter = new Color (0);
@@ -52,6 +50,7 @@ public class getRSSI {
 
 						tempPanel.add(new JLabel("ESSID: " + ESSID));
 						tempPanel.add(addrLabel);
+						tempPanel.add(chanlLabel);
 						tempPanel.add(rssiLabel);
 						ESSID = null ;
 						MainWindow.av_net_panel.add(tempPanel);
@@ -66,6 +65,10 @@ public class getRSSI {
 						ESSID = temp[0];
 //						essidLabel = new JLabel("ESSID: " + temp[0]);
 
+					} else if (record.trim().startsWith("Channel")) {
+						temp = record.split("Channel:");
+						chanlLabel = new JLabel("Channel: " + temp[1]);
+						
 					} else if (record.contains("Signal level=")) {
 						temp = record.split("Signal level=", 2);
 						temp = temp[1].split(" ",2);
@@ -79,13 +82,14 @@ public class getRSSI {
 					}
 				}
 				tempPanel = new JPanel();
-				tempPanel.setLayout(new BoxLayout(tempPanel, BoxLayout.PAGE_AXIS));
-				tempPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 				tempPanel.setBackground(clBrighter);
 
 				tempPanel.add(new JLabel("ESSID: " + ESSID));
 				tempPanel.add(addrLabel);
+				tempPanel.add(chanlLabel);
 				tempPanel.add(rssiLabel);
+				tempPanel.setLayout(new BoxLayout(tempPanel, BoxLayout.PAGE_AXIS));
+				tempPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 
 				MainWindow.av_net_panel.add(tempPanel);
 

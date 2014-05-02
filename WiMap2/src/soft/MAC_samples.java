@@ -10,6 +10,8 @@ public class MAC_samples
 	double RSSI;
 	int X , Y;
 	private boolean isAuth ;
+	private int channel ;
+	private boolean isRepresented;
 	private String MacAddress;
 	private String Essid;
 	private ArrayList <sample> sampleArr = new ArrayList <sample> (); //save samples for each Mac address
@@ -36,27 +38,8 @@ public class MAC_samples
 	 * checks Mac address validity (throws IllegalArgumentException if invalid Mac address)
 	 * sets the ESSID
 	 */
-	public MAC_samples (String essid, String newMac) throws IllegalArgumentException
-	{
-	    if (isValidMac(newMac)) 
-	    	MacAddress = newMac;
-	    else
-	        throw new IllegalArgumentException("Invalid MAC address format: " + newMac);
-		Essid = essid ;
-	}
 
-	
-	public MAC_samples (String newMac, int x, int y)
-	{
-	    if (isValidMac(newMac)) 
-	    	MacAddress = newMac;
-	    else
-	        throw new IllegalArgumentException("Invalid MAC address format: " + newMac);
-		X = x ;
-		Y = y ;
-	}
-
-	public MAC_samples (String essid, String newMac, int x, int y)
+	public MAC_samples (String essid, String newMac, int ch, int x, int y)
 	{
 	    if (isValidMac(newMac)) 
 	    	MacAddress = newMac;
@@ -65,9 +48,10 @@ public class MAC_samples
 		X = x ;
 		Y = y ;
 		Essid = essid ;
+		channel = ch ;
 	}
 
-	public MAC_samples (String essid, String newMac, Boolean Auth, int x, int y)
+	public MAC_samples (String essid, String newMac, int ch, Boolean Auth, int x, int y)
 	{
 	    if (isValidMac(newMac)) 
 	    	MacAddress = newMac;
@@ -76,10 +60,8 @@ public class MAC_samples
 		X = x ;
 		Y = y ;
 		Essid = essid ;
-		if (Auth)
-			this.isAuthorized();
-		else
-			isAuth = false;
+		channel = ch ;
+		setAuthorized(Auth);
 	}
 
 	/*
@@ -152,6 +134,11 @@ public class MAC_samples
 	        throw new IllegalArgumentException("Invalid MAC address format: " + mac_add);
 	}
 
+	public void setChannel(int ch)
+	{
+		channel = ch;
+	}
+
 	/*
 	 * returns the Mac address as String in the default form: 6 2Hexadicimal digits separated by ":"
 	 */
@@ -178,6 +165,11 @@ public class MAC_samples
 		return Essid;
 	}
 	
+	public int getChannel()
+	{
+		return channel ;
+	}
+
 	public void setAuthorized(Boolean auth)
 	{
 		isAuth = auth;

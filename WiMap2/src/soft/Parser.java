@@ -23,9 +23,21 @@ public class Parser {
 		String S = "";
 		String MACAdd = "";
 		String essid = "";
+		int channel = 0 ;
 		float RSSI = 0;
 		BufferedReader br = null;
 		String[] temp ;
+		
+		// IS this right here?
+		String command = "sh scan.sh";
+		try {
+			getRSSI.runShellScript(command);
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		} catch (InterruptedException ie) {
+			ie.printStackTrace();
+		}
+		
 		try {
 			br = new BufferedReader(new FileReader("result.txt")); 
 			while ((S = br.readLine()) != null) {
@@ -62,10 +74,15 @@ public class Parser {
 					temp = temp[1].split("\"",2);
 					essid  = temp[0];
 					PaintPane.Mac.get(n).setESSID(essid);
-
+				}else if (S.contains("Channel"))
+				{
+					temp = S.split("Channel:",2);
+					channel = Integer.parseInt(temp[1]);
+					PaintPane.Mac.get(n).setChannel(channel);
 				}
+				
 				//Read RSSI
-				if(S.contains("RSSI"))
+				else if(S.contains("RSSI"))
 				{ 
 					temp = S.split("Signal level=", 2);
 					RSSI = Float.parseFloat(temp[1]);
@@ -75,6 +92,7 @@ public class Parser {
 					n=0;
 					MACAdd = "";
 				}
+				
 			}
 		} catch (FileNotFoundException k) {
 			k.printStackTrace();

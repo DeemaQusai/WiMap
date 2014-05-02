@@ -78,7 +78,7 @@ public class resolutionDialog extends JDialog {
 			okButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					panelCanvas.setSmoothRes(comboBox.getSelectedIndex()+2);
-					setVisible(false);
+					dispose();
 				}
 			});
 			okButton.setActionCommand("OK");
@@ -89,7 +89,7 @@ public class resolutionDialog extends JDialog {
 			JButton cancelButton = new JButton("Cancel");
 			cancelButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					setVisible(false);
+					dispose();
 				}
 			});
 			cancelButton.setActionCommand("Cancel");

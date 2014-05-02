@@ -378,7 +378,7 @@ public class MainWindow extends JPanel {
 					sidePanel.remove(av_net_panel.get(i));
 				}
 				av_net_panel.clear();
-
+/*
 				String command = "sh scan.sh";
 				try {
 					getRSSI.runShellScript(command);
@@ -386,7 +386,7 @@ public class MainWindow extends JPanel {
 					e.printStackTrace();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
-				}
+				}*/
 				getRSSI.readMyFile("result.txt");
 				for (int i = 0; i < av_net_panel.size(); i++)
 				{
@@ -427,7 +427,7 @@ public class MainWindow extends JPanel {
 		
 		JCheckBox chb = new JCheckBox();
 		
-		for(int x = 0; x < PaintPane.authAPs.size(); x++)
+		for(int x = 0; x < PaintPane.Mac.size(); x++)
 		{
 			String text = "<html>" + PaintPane.authAPs.get(x).getESSID() + "<br>" + PaintPane.authAPs.get(x).getMacAddress() + "</html>";
 			chb.add(new JCheckBox(text));
