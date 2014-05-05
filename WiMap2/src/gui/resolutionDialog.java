@@ -28,28 +28,28 @@ public class resolutionDialog extends JDialog {
 	 * Create the dialog.
 	 */
 
+/*
 	private int selectedRes ;
 	public int getSelected()
 	{
 		return selectedRes ;
 	}
-
+*/
 	public resolutionDialog(final PaintPane p) {
+		final int cancelres = p.getSmoothRes();
 		setBounds(100, 100, 328, 114);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setLayout(new FlowLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		final PaintPane panelCanvas = p;
-
-
+		
 		JLabel lblPickAResolution = new JLabel("Pick a resolution");
 		contentPanel.add(lblPickAResolution);
 
 
 		final JComboBox comboBox = new JComboBox();
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"}));
-		comboBox.setSelectedIndex(4);
+		comboBox.setSelectedIndex(cancelres-2);
 		contentPanel.add(comboBox);
 		
 		JButton btnDefault = new JButton("Default");
@@ -68,7 +68,8 @@ public class resolutionDialog extends JDialog {
 			JButton btnApply = new JButton("Apply");
 			btnApply.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					panelCanvas.setSmoothRes(comboBox.getSelectedIndex()+2);
+					p.setSmoothRes(comboBox.getSelectedIndex()+2);
+					p.repaint();
 				}
 			});
 			buttonPane.add(btnApply);
@@ -77,7 +78,7 @@ public class resolutionDialog extends JDialog {
 			JButton okButton = new JButton("OK");
 			okButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					panelCanvas.setSmoothRes(comboBox.getSelectedIndex()+2);
+					p.setSmoothRes(comboBox.getSelectedIndex()+2);
 					dispose();
 				}
 			});
@@ -89,6 +90,7 @@ public class resolutionDialog extends JDialog {
 			JButton cancelButton = new JButton("Cancel");
 			cancelButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
+					p.setSmoothRes(cancelres);
 					dispose();
 				}
 			});

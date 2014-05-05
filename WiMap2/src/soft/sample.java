@@ -85,18 +85,23 @@ public class sample implements Comparator<sample> {
 		y = newY ;
 		return y ;
 	}
-		/*
-	public Boolean isAP()
-	{
-		return isAP ;
-	}
-	 */
+
+	// for the sort in an array
 	public int compare(sample s1 ,sample s2) {
 		if (s1.getSignal() < s2.getSignal()) return 1 ;
 		if (s1.getSignal() > s2.getSignal()) return -1 ;
 		return 0;
 
 	}
+	
+	public boolean isAtSameLocation(sample s1)
+	{
+		if (x == s1.x && y == s1.y)
+			return true;
+		else
+			return false;
+	}
+	
 	public String toString ()
 	{
 		String temp =Float.toString(signal)+","+x+","+y ; 

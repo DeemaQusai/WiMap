@@ -33,7 +33,7 @@ public class Parser {
 		try {
 			getRSSI.runShellScript(command);
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			System.out.println("YOU ARE ON WINDOWS, AREN'T YOU?");//e.printStackTrace();
 		} catch (InterruptedException ie) {
 			ie.printStackTrace();
 		}
@@ -48,7 +48,7 @@ public class Parser {
 					MACAdd = temp[1];
 					if (PaintPane.Mac.isEmpty())
 					{
-						MAC_samples M = new MAC_samples(MACAdd);
+						MAC_samples M = new MAC_samples(MACAdd.trim());
 						PaintPane.Mac.add(M);
 						i++;
 					}
@@ -64,7 +64,7 @@ public class Parser {
 
 						if(n == i )
 						{
-							MAC_samples M = new MAC_samples(MACAdd);
+							MAC_samples M = new MAC_samples(MACAdd.trim());
 							PaintPane.Mac.add(M);
 							i++;
 						}
@@ -74,7 +74,7 @@ public class Parser {
 					temp = temp[1].split("\"",2);
 					essid  = temp[0];
 					PaintPane.Mac.get(n).setESSID(essid);
-				}else if (S.contains("Channel"))
+				}else if (S.trim().startsWith("Channel"))
 				{
 					temp = S.split("Channel:",2);
 					channel = Integer.parseInt(temp[1]);

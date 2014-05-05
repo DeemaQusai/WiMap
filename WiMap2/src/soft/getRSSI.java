@@ -74,7 +74,6 @@ public class getRSSI {
 						temp = temp[1].split(" ",2);
 						rssiLabel = new JLabel("RSSI: " + temp[0]+ " dBm");
 						level = Double.parseDouble(temp[0]);
-						System.out.println("THIS RSSI: : "+level);
 						for (int i = 0; i > level; i--){
 							clBrighter = Blend(color, Color.white, (float) 0.98);	//add whiteness according to the RSSI
 							color = clBrighter;

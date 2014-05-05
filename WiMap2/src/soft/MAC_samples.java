@@ -10,8 +10,9 @@ public class MAC_samples
 	double RSSI;
 	int X , Y;
 	private boolean isAuth ;
+	private boolean isLocated = false;
 	private int channel ;
-	private boolean isRepresented;
+	private boolean isRepresented = true;	// for drawing
 	private String MacAddress;
 	private String Essid;
 	private ArrayList <sample> sampleArr = new ArrayList <sample> (); //save samples for each Mac address
@@ -20,7 +21,7 @@ public class MAC_samples
 	 * you can't create a MAC_samples object without having it's Mac address
 	 */
 	
-	/*
+	/**
 	 * constructor:
 	 * create a new object with only the Mac Address known (minimum requirement)
 	 * throw exception if the Mac Address was invalid
@@ -33,12 +34,11 @@ public class MAC_samples
 	        throw new IllegalArgumentException("Invalid MAC address format: " + newMac);
 	}
 
-	/*
+	/**
 	 * constructor:
 	 * checks Mac address validity (throws IllegalArgumentException if invalid Mac address)
 	 * sets the ESSID
 	 */
-
 	public MAC_samples (String essid, String newMac, int ch, int x, int y)
 	{
 	    if (isValidMac(newMac)) 
@@ -49,6 +49,19 @@ public class MAC_samples
 		Y = y ;
 		Essid = essid ;
 		channel = ch ;
+		isLocated = true ;
+	}
+
+	public MAC_samples (String essid, String newMac, int ch, Boolean Auth)
+	{
+	    if (isValidMac(newMac)) 
+	    	MacAddress = newMac;
+	    else
+	        throw new IllegalArgumentException("Invalid MAC address format: " + newMac);
+		Essid = essid ;
+		channel = ch ;
+		isLocated = false ;
+		setAuthorized(Auth);
 	}
 
 	public MAC_samples (String essid, String newMac, int ch, Boolean Auth, int x, int y)
@@ -61,10 +74,11 @@ public class MAC_samples
 		Y = y ;
 		Essid = essid ;
 		channel = ch ;
+		isLocated = true ;
 		setAuthorized(Auth);
 	}
 
-	/*
+	/**
 	 * checks if the mac address is a valid one
 	 */
 	public static boolean isValidMac (String mac)
@@ -93,7 +107,21 @@ public class MAC_samples
 		sampleArr.add(s);
 	}
 	
+	public boolean isLocated()
+	{
+		return isLocated;
+	}
 	
+	public boolean isRepresented()
+	{
+		return isRepresented;
+	}
+
+	public void setRepresented(boolean b)
+	{
+		isRepresented = b ;
+	}
+
 	
 	/*
 	 * I did these to keep the sampleArr private
@@ -142,6 +170,13 @@ public class MAC_samples
 	/*
 	 * returns the Mac address as String in the default form: 6 2Hexadicimal digits separated by ":"
 	 */
+	
+	public void setLocation(int x, int y)
+	{
+		X = x;
+		Y = y;
+	}
+	
 	public String getMacAddress()
 	{
 		return MacAddress;
