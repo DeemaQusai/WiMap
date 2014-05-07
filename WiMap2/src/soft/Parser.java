@@ -9,6 +9,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.crypto.Mac;
+import javax.swing.JLabel;
+
 public class Parser {
 	
 	public static ArrayList <Float> sigL= new ArrayList<Float>();
@@ -25,6 +28,7 @@ public class Parser {
 		String essid = "";
 		int channel = 0 ;
 		float RSSI = 0;
+		sample s = null ;
 		BufferedReader br = null;
 		String[] temp ;
 		
@@ -40,60 +44,65 @@ public class Parser {
 		
 		try {
 			br = new BufferedReader(new FileReader("result.txt")); 
+
+			boolean found = false ;
+			int foundAt = PaintPane.Mac.size();
+
 			while ((S = br.readLine()) != null) {
-				//Read MAC address line
+				//Read MAC address line								
+				if (S.contains("Cell ") && !S.contains("Cell 01"))
+				{
+					if (!found)
+						PaintPane.Mac.add(new MAC_samples(essid, MACAdd.trim(), channel, s));
+					else
+						PaintPane.Mac.get(foundAt).addSample(s);
+
+					MACAdd = "" ;
+					essid = "";
+					channel = 0 ;
+					found = false ;
+					foundAt = PaintPane.Mac.size();		
+				}
 				if(S.contains("Address:"))
 				{
 					temp = S.split("Address:", 2);
 					MACAdd = temp[1];
-					if (PaintPane.Mac.isEmpty())
+					for (int i = 0 ; i < PaintPane.Mac.size() ; i++)
 					{
-						MAC_samples M = new MAC_samples(MACAdd.trim());
-						PaintPane.Mac.add(M);
-						i++;
-					}
-					else
-					{
-						while (n < i)
+						if (MACAdd.trim().equals(PaintPane.Mac.get(i).getMacAddress()))
 						{
-							if (MACAdd.equals(PaintPane.Mac.get(n).getMacAddress()))
-								break;
-							else
-								n++;
+							found = true ;
+							foundAt = i ;
+							break;
 						}
+					}
+				}
 
-						if(n == i )
-						{
-							MAC_samples M = new MAC_samples(MACAdd.trim());
-							PaintPane.Mac.add(M);
-							i++;
-						}
-					}
-				}else if (S.contains("ESSID")) {
+				else if (S.contains("ESSID")) {
 					temp = S.split("ESSID:\"",2);
 					temp = temp[1].split("\"",2);
 					essid  = temp[0];
-					PaintPane.Mac.get(n).setESSID(essid);
 				}else if (S.trim().startsWith("Channel"))
 				{
 					temp = S.split("Channel:",2);
 					channel = Integer.parseInt(temp[1]);
-					PaintPane.Mac.get(n).setChannel(channel);
 				}
-				
-				//Read RSSI
-				else if(S.contains("RSSI"))
+				else if(S.contains("Signal level"))
 				{ 
 					temp = S.split("Signal level=", 2);
-					RSSI = Float.parseFloat(temp[1]);
+					temp = temp[1].split(" ",2);
+					RSSI = Float.parseFloat(temp[0]);
 					//sample s = new sample(RSSI, e.getX(), e.getY());
-					PaintPane.Mac.get(n).addSample(RSSI, e.getX(), e.getY());
+					s = new sample(RSSI, e.getX(), e.getY());
 					sigL.add(RSSI);
-					n=0;
-					MACAdd = "";
 				}
 				
 			}
+			if (!found)
+				PaintPane.Mac.add(new MAC_samples(essid, MACAdd.trim(), channel, s));
+			else
+				PaintPane.Mac.get(foundAt).addSample(s);
+
 		} catch (FileNotFoundException k) {
 			k.printStackTrace();
 		} catch (IOException t) {
@@ -101,7 +110,22 @@ public class Parser {
 			t.printStackTrace();
 		}
 		
-		sample D = new sample(RSSI , e.getX(), e.getY()); // to save all samples ( not for specific MAC address)
-		PaintPane.mySamples.add(D);
+		Float max = sigL.get(0); 
+		for (int i = 1; i < sigL.size() ; i++)
+		{
+			if (max < sigL.get(i))
+				max = sigL.get(i);
+		}
+		PaintPane.mySamples.add(new sample(max, e.getX(), e.getY()));
+		System.out.println("mysample.size()" + PaintPane.mySamples.size());
+		
+		
+		/*
+		for (int i = 0 ; i < PaintPane.mySamples.size() ; i++)
+		{
+			System.out.println(PaintPane.mySamples.get(i).getX() + "," + PaintPane.mySamples.get(i).getY() + " : " + PaintPane.mySamples.get(i).getSignal() );
+		}*/
+		//sample D = new sample(RSSI , e.getX(), e.getY()); // to save all samples ( not for specific MAC address)
+		//PaintPane.mySamples.add(D);
 	}
 }

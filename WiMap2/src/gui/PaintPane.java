@@ -61,7 +61,7 @@ public class PaintPane extends JComponent {
 	
 	public static Boolean AP_here = false;
 
-
+	//private static int starti ; // for finding the highest RSSI in mysamples <-- has ALL samples 
 	//need for saving samples
 	int i = 0; // # of distinct MAC address
 	int n = 0; //Counter
@@ -120,6 +120,7 @@ public class PaintPane extends JComponent {
 
 				JLabel tryLabel = new JLabel(Integer.toString(mySamples.size()+1));
 
+				
 				for(int n = 0 ; n < Parser.sigL.size(); n++)
 				{
 					if (n == 0)
@@ -129,7 +130,7 @@ public class PaintPane extends JComponent {
 
 				}
 				tryLabel.setToolTipText(show);	
-
+				 
 				// handles the right click on a sample (a JLabel)
 				tryLabel.addMouseListener(new MouseAdapter() {  
 					public void mousePressed(MouseEvent mev){  
@@ -153,7 +154,7 @@ public class PaintPane extends JComponent {
 				smoothBtn.setEnabled(true);
 				sampleCount.setText("Number of samples: " + Integer.toString(mySamples.size()));
 				repaint();
-
+				System.out.println("Mac.size()" + Mac.size());
 			}
 		};	
 		Virtual_Samples = new MouseAdapter()
@@ -337,6 +338,7 @@ public class PaintPane extends JComponent {
 		Color myColor;
 		int image_H = 0;
 		int image_W = 0;
+		
 		try{
 			image_W = image.getHeight();
 			image_H = image.getWidth();
@@ -360,11 +362,12 @@ public class PaintPane extends JComponent {
 						double dx = 0 ;
 						double wj = 0 ;
 						d = 0;
-						for (int j = 0 ; j<mySamples.size() ; j++){
+						//starti = 0;
+						for (int j = 0 ; j<mySamples.size() ; j++){ // = starti){
 							d = distance(x, y, (int)mySamples.get(j).getX(), (int)mySamples.get(j).getY());
 							if(x < mySamples.get(j).getX() && mySamples.get(j).getX() < x+l && y < mySamples.get(j).getY() && mySamples.get(j).getY() <y+l)
 							{
-								value = (int) Math.abs(mySamples.get(j).getSignal());
+								value = (int) Math.abs(mySamples.get(j).getSignal());// getNextValue());
 								//	System.out.println("value(" + x + "," + y + ") = " + value);
 
 								myColor = getColor (value);
@@ -378,11 +381,12 @@ public class PaintPane extends JComponent {
 						}
 						dx = 0; 
 						double wi = 0 ;
-						for(int i = 0 ; i<mySamples.size(); i++)
+						//starti = 0;
+						for(int i = 0 ; i<mySamples.size(); i++)// = starti)
 						{
 							dx = distance(x, y, (int)mySamples.get(i).getX(), (int)mySamples.get(i).getY()); 
 							wi = 1 / Math.pow(dx, p) ;
-							value = (int) (value + ((wi * (Math.abs(mySamples.get(i).getSignal())))/wj));
+							value = (int) (value + ((wi * (Math.abs(mySamples.get(i).getSignal())))/wj));  //getNextValue()
 						}
 
 						myColor = getColor (value);
@@ -418,18 +422,33 @@ public class PaintPane extends JComponent {
 				}
 			}
 			*/
-			
-			for (int i = 0; i < mySamples.size() ; i++)
+			//starti = 0;
+			for (int i = 0; i < mySamples.size() ; i++)// = starti)
 			{
 				//value = (int)(mySamples.get(i).getSignal()) * -1;		//the strength of the red from the signal level
-				value = (int) (mySamples.get(i).getSignal() * -1);
+				value = (int) (mySamples.get(i).getSignal()*-1); //getNextValue() * -1);
 				myColor = getColor (value);
 				g.setColor(myColor); 
 				g.fillRect(mySamples.get(i).getX()-(rectLength/2), mySamples.get(i).getY()-(rectLength/2), rectLength, rectLength);		//
 			}					
 		}
 	}
-
+/*
+	public int getNextValue()
+	{
+		double maxVal= mySamples.get(starti).getSignal() ;
+		for (int i = starti ; i < mySamples.size()-1; i++)
+		{
+			if (!mySamples.get(i).isAtSameLocation(mySamples.get(i+1)))
+			{
+				starti = i+1;
+				break;
+			}
+			else
+				maxVal = Math.max(mySamples.get(i).getSignal(), mySamples.get(i+1).getSignal());
+		}
+		return (int)maxVal;
+	}*/
 	public double distance (int x2, int y2, int x1, int y1)
 	{
 		double ds = 0; 
@@ -1017,7 +1036,7 @@ public class PaintPane extends JComponent {
 					{
 						found = true ;
 						Mac.get(i).setAuthorized(auth);
-						
+						// MUST DO MORE STUFF HERE??
 						break;
 					}
 				}

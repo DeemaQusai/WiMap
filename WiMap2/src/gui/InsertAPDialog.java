@@ -45,7 +45,7 @@ public class InsertAPDialog extends JDialog {
 	 */
 	int x;
 	int y;
-	boolean isApPosSet = false;
+//	boolean isApPosSet = false;
 	boolean macExists = false;
 	int macIndex = PaintPane.Mac.size();
 	
@@ -101,7 +101,6 @@ public class InsertAPDialog extends JDialog {
 			btnSetPosition.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					setVisible(false);
-					isApPosSet = true ;
 					MainWindow.panelCanvas.apPosition();
 				}
 			});
@@ -142,13 +141,13 @@ public class InsertAPDialog extends JDialog {
 		channeltf.setBounds(125, 103, 157, 21);
 		contentPanel.add(channeltf);
 		{
-			YTextF = new JTextField();
+			YTextF = new JTextField("0");
 			YTextF.setBounds(211, 149, 37, 20);
 			contentPanel.add(YTextF);
 			YTextF.setColumns(10);
 		}
 		{
-			XTextF = new JTextField();
+			XTextF = new JTextField("0");
 			XTextF.setColumns(10);
 			XTextF.setBounds(144, 149, 37, 20);
 			contentPanel.add(XTextF);
@@ -178,13 +177,14 @@ public class InsertAPDialog extends JDialog {
 								XTextF.setText(Integer.toString(PaintPane.Mac.get(i).getApX()));
 								YTextF.setText(Integer.toString(PaintPane.Mac.get(i).getApY()));
 								chckbxAuth.setSelected(PaintPane.Mac.get(i).isAuthorized());
-								break;
+								return;
 							}
 						}
 					}
+					reset();
 				}
 			});
-			btnExist.setBounds(294, 10, 59, 23);
+			btnExist.setBounds(287, 10, 66, 23);
 			contentPanel.add(btnExist);
 		}
 		{
@@ -195,7 +195,6 @@ public class InsertAPDialog extends JDialog {
 				JButton okButton = new JButton("Done");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						isApPosSet = false ; 
 						dispose();
 					}
 				});
@@ -212,11 +211,7 @@ public class InsertAPDialog extends JDialog {
 		{
 			if (PaintPane.Mac.get(i).getMacAddress().equals(MacAddtf.getText()) || PaintPane.Mac.get(i).getMac_Address().equals(MacAddtf.getText()))
 			{
-				if (isApPosSet)
-				{
-					PaintPane.Mac.get(i).setLocation(Integer.parseInt(XTextF.getText())	, Integer.parseInt(YTextF.getText()));
-					isApPosSet = false;
-				}
+				PaintPane.Mac.get(i).setLocation(Integer.parseInt(XTextF.getText())	, Integer.parseInt(YTextF.getText()));
 				PaintPane.Mac.get(i).setChannel(Integer.parseInt(channeltf.getText()));
 				PaintPane.Mac.get(i).setAuthorized(isAuth);
 				PaintPane.Mac.get(i).setESSID(essidtf.getText());
@@ -224,12 +219,9 @@ public class InsertAPDialog extends JDialog {
 			}
 		}
 		
-		if (isApPosSet)
-			PaintPane.Mac.add(new MAC_samples(essidtf.getText(), MacAddtf.getText(), Integer.parseInt(channeltf.getText()), isAuth, Integer.parseInt(XTextF.getText()), Integer.parseInt(YTextF.getText())));
-		else
-			PaintPane.Mac.add(new MAC_samples(essidtf.getText(), MacAddtf.getText(), Integer.parseInt(channeltf.getText()), isAuth));
-		isApPosSet = false;
+		PaintPane.Mac.add(new MAC_samples(essidtf.getText(), MacAddtf.getText(), Integer.parseInt(channeltf.getText()), isAuth, Integer.parseInt(XTextF.getText()), Integer.parseInt(YTextF.getText())));
 		
+		reset();
 	}
 	
 	public void setXY(int newx, int newy)
@@ -243,7 +235,6 @@ public class InsertAPDialog extends JDialog {
 	
 	public void reset()
 	{
-		MacAddtf.setText("");
 		essidtf.setText("");
 		channeltf.setText("");
 		XTextF.setText("0");

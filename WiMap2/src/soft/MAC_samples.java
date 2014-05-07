@@ -1,5 +1,6 @@
 package soft;
 import soft.sample;
+import gui.PaintPane;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,6 +65,20 @@ public class MAC_samples
 		setAuthorized(Auth);
 	}
 
+
+	public MAC_samples (String essid, String newMac, int ch, sample samp)
+	{
+	    if (isValidMac(newMac)) 
+	    	MacAddress = newMac;
+	    else
+	        throw new IllegalArgumentException("Invalid MAC address format: " + newMac);
+		Essid = essid ;
+		channel = ch ;
+		isLocated = false ;
+		this.addSample(samp);
+//		sampleArr.add(samp);
+	}
+
 	public MAC_samples (String essid, String newMac, int ch, Boolean Auth, int x, int y)
 	{
 	    if (isValidMac(newMac)) 
@@ -99,11 +114,13 @@ public class MAC_samples
 	
 	public void addSample(float sig ,int x, int y)
 	{
+		//PaintPane.mySamples.add(new sample(sig, x, y));
 		sampleArr.add(new sample(sig, x, y));
 	}
 
 	public void addSample(sample s)
 	{
+		//PaintPane.mySamples.add(s);
 		sampleArr.add(s);
 	}
 	
