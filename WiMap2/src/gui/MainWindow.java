@@ -7,13 +7,10 @@ import java.awt.event.*;
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
-import java.util.List;
 
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.undo.AbstractUndoableEdit;
 
 public class MainWindow extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -22,10 +19,12 @@ public class MainWindow extends JPanel {
 	private static JScrollPane jsp;
 	private static JPanel sidePanel;
 	private static JPanel authAP_sp;
+	private static JScrollPane sidesp1;
+	private static JScrollPane sidesp2;
 	private static JTabbedPane tb;
 	public static ArrayList<JPanel> av_net_panel = new ArrayList<JPanel> ();
 	public static ArrayList<JCheckBox> chbxlist = new ArrayList<JCheckBox>() ;
-	
+
 	public static InsertAPDialog insertapdialog;
 	static JFrame f ;
 	private static JScrollPane sp ;
@@ -49,39 +48,39 @@ public class MainWindow extends JPanel {
 
 		JMenuItem newItem = new JMenuItem("New");
 		newItem.setAccelerator(KeyStroke.getKeyStroke('N', KeyEvent.CTRL_DOWN_MASK));
-/*		
+		/*		
 		JMenuItem loadItem = new JMenuItem("Load");					//create the open
 		loadItem.setAccelerator(KeyStroke.getKeyStroke('O', KeyEvent.CTRL_DOWN_MASK));
-*/		
+		 */		
 		final JMenuItem loadDataItem = new JMenuItem("Load Data");					//del
 
 		final JMenuItem saveItem = new JMenuItem("Save");					//create the save
 		saveItem.setAccelerator(KeyStroke.getKeyStroke('S', KeyEvent.CTRL_DOWN_MASK));
-		
+
 		JMenuItem exit = new JMenuItem("Exit");						//create the exit
-		
+
 		final JMenuItem computePLEItem = new JMenuItem("Compute PLE");
 		final JMenuItem insertAPItem = new JMenuItem("Insert AP");
 		final JMenuItem SigmaItem = new JMenuItem("Insert Sigma");
 		final JMenuItem manageAPsItem = new JMenuItem("Manage Access Points");
 		final JMenuItem changeScaleItem = new JMenuItem("Change map scale");
 		final JMenuItem smoothResItem = new JMenuItem("Smooth resolution");
-		final JMenuItem HAPsItem = new JMenuItem("hypothetical AP’s");
+		final JMenuItem HAPsItem = new JMenuItem("hypothetical AP's");
 
 		JMenuItem aboutItem = new JMenuItem("About WiMAP");			//create the about 
 
 		newItem.setToolTipText("New project");		//tool tip (on mouse hover)
-//		loadItem.setToolTipText("Open Floor Plan");		//tool tip (on mouse hover)
+		//		loadItem.setToolTipText("Open Floor Plan");		//tool tip (on mouse hover)
 		saveItem.setToolTipText("Save Map");			//tool tip (on mouse hover)
 		exit.setToolTipText("Exit application");		//tool tip (on mouse hover)
 		smoothResItem.setToolTipText("Effects speed");		//??
 
 		fileMenu.add(newItem);			//add the new to the "file" menu
-//		fileMenu.add(loadItem);			//add the open to the "file" menu
+		//		fileMenu.add(loadItem);			//add the open to the "file" menu
 		fileMenu.add(loadDataItem);		
 		fileMenu.add(saveItem);			//add the save to the "file" menu
 		fileMenu.add(exit);				//add the exit to the "file" menu
-		
+
 		insertMenu.add(insertAPItem);
 		insertMenu.add(SigmaItem);
 		insertMenu.add(HAPsItem);
@@ -92,12 +91,12 @@ public class MainWindow extends JPanel {
 		toolsMenu.add(smoothResItem);
 
 		HelpMenu.add(aboutItem);		//add the about to the "Help" menu
-		
+
 		/*******************************File Menu******************************************/
 		// NEW 
 		newItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				
+
 				try {
 					newActionPerformed (event);
 				} catch (Exception e)
@@ -118,7 +117,7 @@ public class MainWindow extends JPanel {
 		});
 
 		// OPEN
-/*		loadItem.addActionListener(new ActionListener() {		//action listener for open
+		/*		loadItem.addActionListener(new ActionListener() {		//action listener for open
 			public void actionPerformed(ActionEvent event) {
 				boolean flag = true ;
 				try {
@@ -131,7 +130,7 @@ public class MainWindow extends JPanel {
 				saveItem.setEnabled(flag);
 			}
 		});
-*/
+		 */
 		loadDataItem.addActionListener(new ActionListener() {		//action listener for open
 			public void actionPerformed(ActionEvent event) {
 				try {
@@ -166,14 +165,14 @@ public class MainWindow extends JPanel {
 			}
 		});
 		computePLEItem.setEnabled(false);
-		
+
 		manageAPsItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				new MngAP();
 			}
 		});
 		manageAPsItem.setEnabled(false);
-		
+
 		insertAPItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				try {
@@ -186,13 +185,13 @@ public class MainWindow extends JPanel {
 			}
 		});
 		insertAPItem.setEnabled(false);
-		
+
 		SigmaItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				panelCanvas.InsertSigma();
 			}
 		});
-		
+
 		changeScaleItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				panelCanvas.removeMouseListener(panelCanvas.samplingML);
@@ -201,7 +200,7 @@ public class MainWindow extends JPanel {
 			}
 		});
 		changeScaleItem.setEnabled(false);
-		
+
 		smoothResItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				try {
@@ -211,7 +210,7 @@ public class MainWindow extends JPanel {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-/*try {
+				/*try {
 					String input = JOptionPane.showInputDialog(null, "Enter size of square in pixels", ""); // ??
 					if (panelCanvas.setSmoothRes(Integer.parseInt(input)))
 						JOptionPane.showMessageDialog(null, "New smooth Resolution : " + panelCanvas.getSmoothRes());
@@ -226,14 +225,14 @@ public class MainWindow extends JPanel {
 			}
 		});
 		smoothResItem.setEnabled(false);
-		
+
 		HAPsItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				panelCanvas.H_APs();
 			}
 		});
 		HAPsItem.setEnabled(false);
-		
+
 		/*******************************Help Menu******************************************/
 		aboutItem.addActionListener(new ActionListener() {			//action listener for about
 			public void actionPerformed(ActionEvent event) {
@@ -251,24 +250,29 @@ public class MainWindow extends JPanel {
 		loadtextFC.setMultiSelectionEnabled(true);
 		loadtextFC.showOpenDialog(jsp);		//open the dialog box in a jscrollpane
 		File[] files = loadtextFC.getSelectedFiles();
-		
+
 		panelCanvas.fillSample(files);
 	}
-	
+
 	public static void newActionPerformed (ActionEvent event)
 	{
 		openImageAction();
 	}
-/*
+	/*
 	public static void openActionPerformed (ActionEvent event)
 	{
 		// ?? all unsaved progress will be lost, would you like to save before you open a new project?
 		panelCanvas.initialize();
 		openImageAction();
 	}
-*/
+	 */
 	public static void saveActionPerformed (ActionEvent event)
 	{	
+		save();
+	}
+
+	private static void save()
+	{
 		try {
 			SaveOptions dialog = new SaveOptions(panelCanvas, image);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -280,7 +284,7 @@ public class MainWindow extends JPanel {
 
 	public static void aboutActionPerformed (ActionEvent event)
 	{
-		JOptionPane.showMessageDialog(f, "WiMAP ver2.0\nÂ© Copyright, Jordan University of Science and Technology 2013.\n"
+		JOptionPane.showMessageDialog(f, "WiMAP ver2.0\n© Copyright, Jordan University of Science and Technology 2013.\n"
 				+ "All rights reserved.\nNetwork Engineering and Security Department\n- Bayan Taani\n- Wala'a Adel\n"
 				+ "- Deema Qusai", "About WiMAP", 3);
 	}
@@ -325,9 +329,9 @@ public class MainWindow extends JPanel {
 			f.setLocationRelativeTo(null);
 		}
 		panelCanvas.initialize();
-		
+
 	}
-	
+
 	/*Add the upper toolbar*/
 	public void addToolBar()
 	{
@@ -352,16 +356,38 @@ public class MainWindow extends JPanel {
 	public void addSidePanel()
 	{
 		tb = new JTabbedPane();
-		
-		sidePanel = new JPanel(/*new BorderLayout()*/);
-		sidePanel.setBackground(new Color(windowColor));
-		sidePanel.setName("SidePanel");
-		sidePanel.setPreferredSize(new Dimension(250, f.getHeight()));
 
-		//sidePanel.add(new JLabel ("Available Networks:", SwingConstants.LEFT),  BorderLayout.PAGE_START);
-		
 		tb.setBackground(new Color(windowColor));
 		tb.setPreferredSize(new Dimension(250, f.getHeight()));
+		tb.setEnabled(true);
+		tb.setVisible(true);
+		add(tb, BorderLayout.WEST);
+
+		//adding the other tab:
+
+		addAuthAPsTab();
+	}
+
+	public void updateSidePanel (ArrayList<JPanel> jPanelArr)
+	{
+		for (int i = 0; i < av_net_panel.size(); i++)
+		{
+			jPanelArr.get(i).setPreferredSize(new Dimension(sidePanel.getWidth(), 75));
+			jPanelArr.get(i).validate();
+			jPanelArr.get(i).repaint();
+			sidePanel.add(jPanelArr.get(i));
+			sidePanel.validate();
+			sidePanel.repaint();
+		}
+	}
+
+	private void addAuthAPsTab()
+	{
+		updateAPList();
+
+		sidePanel = new JPanel();
+		sidePanel.setBackground(new Color(windowColor));
+		sidePanel.setName("SidePanel");
 
 		JButton scanBtn = new JButton("Live Scan");
 		scanBtn.setToolTipText("Shows only result for last scan");
@@ -383,87 +409,87 @@ public class MainWindow extends JPanel {
 					e.printStackTrace();
 				}
 				getRSSI.readMyFile("result.txt");
+
 				updateSidePanel(av_net_panel);
 			}
 		});
 
 		sidePanel.add(scanBtn);
 
+
 		sidePanel.setEnabled(true);
 		sidePanel.setVisible(true);
 
-		tb.addTab("Available Networks", sidePanel);
-		tb.setEnabled(true);
-		tb.setVisible(true);
-		add(tb, BorderLayout.WEST);
-		
-		//adding the other tab:
-		
-		addAuthAPsTab();
+		sidePanel.setPreferredSize(new Dimension(220, 1000));
 
-		//add(sidePanel, BorderLayout.WEST);
-	}
-	
-	public void updateSidePanel (ArrayList<JPanel> jPanelArr)
-	{
-		for (int i = 0; i < av_net_panel.size(); i++)
-		{
-			jPanelArr.get(i).setPreferredSize(new Dimension(sidePanel.getWidth(), 75));
-			jPanelArr.get(i).validate();
-			jPanelArr.get(i).repaint();
-			sidePanel.add(jPanelArr.get(i));
-			sidePanel.validate();
-			sidePanel.repaint();
-		}
-	}
+		sidesp1 = new JScrollPane(sidePanel);
+		sidesp1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
-	private void addAuthAPsTab() {
-		
+		tb.addTab("Available Networks", sidesp1);
+
 		authAP_sp = new JPanel();
-		
+
 		authAP_sp.setBackground(new Color(windowColor));
 		authAP_sp.setName("SidePanel");
 		authAP_sp.setPreferredSize(new Dimension(240, f.getHeight()));
-		updateAPList();
-		
-		authAP_sp.add(new JButton("Refresh"){{
-		    addActionListener(new ActionListener() {
-		        public void actionPerformed(ActionEvent event) {
-		            updateAPList();
-		        }
-		    });
-		}});
+
+		authAP_sp.add(new JButton("Refresh"){
+			private static final long serialVersionUID = 1L;
+			{
+				addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent event) {
+						updateAPList();
+					}
+				});
+			}});
+
 		authAP_sp.setEnabled(true);
 		authAP_sp.setVisible(true);
-		JScrollPane APListSP = new JScrollPane(authAP_sp);
-		tb.addTab("AP list", APListSP);
+		authAP_sp.setPreferredSize(new Dimension(220, 1000));
+
+		sidesp2 = new JScrollPane(authAP_sp);
+		tb.addTab("AP list", sidesp2);
 	}
 
 	public static void updateAPList ()
 	{
+
 		for(int x = chbxlist.size(); x < PaintPane.Mac.size(); x++)
 		{
 			JPanel tempPanel = new JPanel();
-			tempPanel.setLayout(new BoxLayout(tempPanel, BoxLayout.PAGE_AXIS));
+
+
 			tempPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 			tempPanel.setPreferredSize(new Dimension(sidePanel.getWidth(), 105));
 			tempPanel.validate();
 			tempPanel.repaint();
 
 			chbxlist.add(new JCheckBox());
+
 			tempPanel.add(chbxlist.get(chbxlist.size()-1));
-			tempPanel.add(Box.createRigidArea(new Dimension(chbxlist.get(0).getWidth(), chbxlist.get(0).getHeight())));
-			JLabel tempL = new JLabel("ESSID: " + PaintPane.Mac.get(x).getESSID());
-			tempPanel.add(tempL);
+			//tempPanel.add(Box.createRigidArea(new Dimension(chbxlist.get(0).getWidth(), chbxlist.get(0).getHeight())));
+			//		JLabel tempL = new JLabel("ESSID: " + PaintPane.Mac.get(x).getESSID());
+
+			String panelContents = "<html>" + "ESSID: " + PaintPane.Mac.get(x).getESSID() + "<br>" +
+					"MAC: " + PaintPane.Mac.get(x).getMacAddress() + "<br>" +
+					"Channel: " + PaintPane.Mac.get(x).getChannel() + "<br>" +
+					"Position: (" + PaintPane.Mac.get(x).getApX() + "," + PaintPane.Mac.get(x).getApY() + ")" + "<br>" +
+					"Sample Count: " + PaintPane.Mac.get(x).getSampleCount() + "<br>" +
+					"</html>";
+
+			tempPanel.add(new JLabel(panelContents));
+
+			/*tempPanel.add(tempL);
 			tempPanel.add(new JLabel("MAC: " + PaintPane.Mac.get(x).getMacAddress()));
 			tempPanel.add(new JLabel("Channel: " + PaintPane.Mac.get(x).getChannel()));
 			tempPanel.add(new JLabel("Position: (" + PaintPane.Mac.get(x).getApX() + "," + PaintPane.Mac.get(x).getApY() + ")"));
 			tempPanel.add(new JLabel("Sample Count: " + PaintPane.Mac.get(x).getSampleCount()));
-
+			 */
 			authAP_sp.add(tempPanel);
 			authAP_sp.validate();
 			authAP_sp.repaint();
 		}
+
 
 	}
 	public MainWindow() {
@@ -488,7 +514,22 @@ public class MainWindow extends JPanel {
 				f.setContentPane(p);
 				f.setJMenuBar(createMenuBar());
 				f.setSize(400, 300);
-				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+				f.addWindowListener(new WindowAdapter() {
+					@Override
+					public void windowClosing(WindowEvent we)
+					{ 
+						String ObjButtons[] = {"Save","Discard"};
+						int PromptResult = JOptionPane.showOptionDialog(null,"Save before exit?","",JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null,ObjButtons,ObjButtons[1]);
+						if(PromptResult==JOptionPane.NO_OPTION)
+						{
+							System.exit(0);
+						} else if(PromptResult==JOptionPane.YES_OPTION)
+						{////////////????????
+							save();   
+						}
+					}
+				});
 				f.setVisible(true);
 			}
 		});

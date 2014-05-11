@@ -12,7 +12,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Random;
@@ -326,11 +325,6 @@ public class PaintPane extends JComponent {
 		
 		if (image == null)
 			return ;
-		for (int i = 0 ; i < Mac.size() ; i++)
-		{
-			if (Mac.get(i).isLocated())
-				g.drawImage(APIcon, Mac.get(i).getApX()-(APIcon.getWidth()/2), Mac.get(i).getApY()-(APIcon.getHeight()), null);
-		}
 		
 		//System.out.println("REPAINTING");
 		//double value =0 ;
@@ -430,8 +424,15 @@ public class PaintPane extends JComponent {
 				myColor = getColor (value);
 				g.setColor(myColor); 
 				g.fillRect(mySamples.get(i).getX()-(rectLength/2), mySamples.get(i).getY()-(rectLength/2), rectLength, rectLength);		//
-			}					
+			}		
+			
 		}
+		for (int i = 0 ; i < Mac.size() ; i++)
+		{
+			if (Mac.get(i).isLocated())
+				g.drawImage(APIcon, Mac.get(i).getApX()-(APIcon.getWidth()/2), Mac.get(i).getApY()-(APIcon.getHeight()), null);
+		}
+
 	}
 /*
 	public int getNextValue()

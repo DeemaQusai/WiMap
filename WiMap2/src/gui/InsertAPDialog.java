@@ -21,6 +21,7 @@ import java.awt.Color;
 
 public class InsertAPDialog extends JDialog {
 
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField MacAddtf;
 	private JTextField essidtf;
@@ -218,8 +219,13 @@ public class InsertAPDialog extends JDialog {
 				return;
 			}
 		}
-		
-		PaintPane.Mac.add(new MAC_samples(essidtf.getText(), MacAddtf.getText(), Integer.parseInt(channeltf.getText()), isAuth, Integer.parseInt(XTextF.getText()), Integer.parseInt(YTextF.getText())));
+		int channel=0;
+		try
+		{
+			channel = Integer.parseInt(channeltf.getText());
+		}catch (Exception e)
+		{ }
+		PaintPane.Mac.add(new MAC_samples(essidtf.getText(), MacAddtf.getText(), channel , isAuth, Integer.parseInt(XTextF.getText()), Integer.parseInt(YTextF.getText())));
 		
 		reset();
 	}

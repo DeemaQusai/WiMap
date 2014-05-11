@@ -95,7 +95,8 @@ public class getRSSI {
 				data_is.close();
 			} catch (IOException e) {
 				// catch io errors from FileInputStream or readLine()
-				System.out.println("Uh oh, got an IOException error!" + e.getMessage());
+				e.printStackTrace();
+//				System.out.println("Uh oh, got an IOException error!" + e.getMessage());
 
 			} finally {
 				// if the file opened okay, make sure we close it

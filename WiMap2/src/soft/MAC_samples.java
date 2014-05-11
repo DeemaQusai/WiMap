@@ -1,6 +1,4 @@
 package soft;
-import soft.sample;
-import gui.PaintPane;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

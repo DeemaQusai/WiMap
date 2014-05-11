@@ -9,9 +9,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.crypto.Mac;
-import javax.swing.JLabel;
-
 public class Parser {
 	
 	public static ArrayList <Float> sigL= new ArrayList<Float>();
