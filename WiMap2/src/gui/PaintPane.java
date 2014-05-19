@@ -390,32 +390,8 @@ public class PaintPane extends JComponent {
 			//System.out.println("value(" + x + ") = " + value);
 			}
 
-		} /*else if (AP_here) {
-			BufferedImage APimage;
-			try {
-				APimage = ImageIO.read(new File("resources/AP.jpg"));
-				g.drawImage(APimage,(int)AP_x-50, (int)AP_y-50, 100, 100, null); //then you can't paint the samples
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			}
-		*/
-
+		} 
 		else {
-			/*
-			for(int i =0; i<Mac.size();i++)
-			{
-				for (int j=0; j<Mac.get(i).getSampleCount(); j++)
-				{
-					value = (int)(Mac.get(i).getS_RSSI(j)*-1);
-					myColor = getColor (value);
-					g.setColor(myColor); 
-					g.fillRect(Mac.get(i).getS_X(j)-(rectLength/2),Mac.get(i).getS_Y(j)-(rectLength/2), rectLength, rectLength);		//
-				}
-			}
-			*/
-			//starti = 0;
 			
 			for (int i = 0; i < mySamples.size() ; i++)// = starti)
 			{
@@ -436,22 +412,7 @@ public class PaintPane extends JComponent {
 		}
 
 	}
-/*
-	public int getNextValue()
-	{
-		double maxVal= mySamples.get(starti).getSignal() ;
-		for (int i = starti ; i < mySamples.size()-1; i++)
-		{
-			if (!mySamples.get(i).isAtSameLocation(mySamples.get(i+1)))
-			{
-				starti = i+1;
-				break;
-			}
-			else
-				maxVal = Math.max(mySamples.get(i).getSignal(), mySamples.get(i+1).getSignal());
-		}
-		return (int)maxVal;
-	}*/
+
 	public double distance (int x2, int y2, int x1, int y1)
 	{
 		double ds = 0; 

@@ -453,12 +453,14 @@ public class MainWindow extends JPanel {
 
 	public static void updateAPList ()
 	{
-
-		for(int x = chbxlist.size(); x < PaintPane.Mac.size(); x++)
+		if (PaintPane.Mac.size() != 0)
+		{
+			authAP_sp.removeAll();
+			chbxlist.clear();
+		}
+		for(int x = 0; x < PaintPane.Mac.size(); x++)
 		{
 			JPanel tempPanel = new JPanel();
-
-
 			tempPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 			tempPanel.setPreferredSize(new Dimension(sidePanel.getWidth(), 105));
 			tempPanel.validate();

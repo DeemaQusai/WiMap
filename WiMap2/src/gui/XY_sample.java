@@ -33,7 +33,7 @@ public class XY_sample {
 	public void addSample (sample s)
 	{
 		sampleList.add(s);
-		if (s.getSignal() > MaxRSSI)
+		if (s.getSignal() > MaxRSSI && s.toPaint())
 			MaxRSSI = s.getSignal();
 	}
 	
@@ -75,7 +75,8 @@ public class XY_sample {
 			}
 			catch (NullPointerException e)
 			{
-				
+				System.out.println("XY_sample.changeMaxRSSI()");
+				// remove sample from list
 			}
 		}
 	}
