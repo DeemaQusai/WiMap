@@ -44,7 +44,7 @@ public class PaintPane extends JComponent {
 	private JTextField sampleCount ;
 
 	private int l = DEFAULT_RES ;
-	private int rectLength = 20;		// for smoothing off
+	private int rectLength = 15;		// for smoothing off
 
 	public double mapScale ;
 	public static int AP_x , AP_y;
@@ -141,7 +141,7 @@ public class PaintPane extends JComponent {
 
 				});    
 
-				tryLabel.setBounds(e.getX()-15, e.getY()-15, 30, 30);
+				tryLabel.setBounds(e.getX()-(10/2), e.getY()-(10/2), 10, 10);
 				tryLabel.setVisible(true);
 				myLabels.add(tryLabel);
 				add(tryLabel);
@@ -416,6 +416,7 @@ public class PaintPane extends JComponent {
 			}
 			*/
 			//starti = 0;
+			
 			for (int i = 0; i < mySamples.size() ; i++)// = starti)
 			{
 				//value = (int)(mySamples.get(i).getSignal()) * -1;		//the strength of the red from the signal level
@@ -932,7 +933,7 @@ public class PaintPane extends JComponent {
 			if (sr < image.getHeight()&& sr < image.getWidth())	// if input is within limit
 			{
 				l = sr;
-				rectLength = sr *(20/6);		// defailt for l = 6. default for rectlength = 20
+				rectLength = sr *(15/DEFAULT_RES);		// defailt for l = 6. default for rectlength = 20
 				repaint();
 				return true;
 			}

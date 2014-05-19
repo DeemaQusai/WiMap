@@ -22,6 +22,13 @@ public class XY_sample {
 		MaxRSSI = s.getSignal();
 	}
 	
+	public XY_sample(int x, int y)
+	{
+		X = x;
+		Y = y;
+		sampleList = new ArrayList<sample>();
+	}
+	
 	public void addSample (sample s)
 	{
 		sampleList.add(s);

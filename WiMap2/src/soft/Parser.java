@@ -1,6 +1,7 @@
 package soft;
 
 import gui.PaintPane;
+import gui.XY_sample;
 
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -29,6 +30,9 @@ public class Parser {
 		BufferedReader br = null;
 		String[] temp ;
 		
+		PaintPane.mySamples.add(new XY_sample(e.getX(), e.getY()));
+		int mySampleIndex = PaintPane.mySamples.size()-1;
+		
 		// IS this right here?
 		String command = "sh scan.sh";
 		try {
@@ -46,18 +50,20 @@ public class Parser {
 			int foundAt = PaintPane.Mac.size();
 
 			while ((S = br.readLine()) != null) {
-				//Read MAC address line								
+				//Read MAC address line			
 				if (S.contains("Cell ") && !S.contains("Cell 01"))
 				{
 					if (!found)
 					{
 						PaintPane.Mac.add(new MAC_samples(essid, MACAdd.trim(), channel, s));
-						s.addMac(PaintPane.Mac.get(PaintPane.Mac.size()));
+						s.addMac(PaintPane.Mac.get(PaintPane.Mac.size()-1));
+						PaintPane.mySamples.get(mySampleIndex).addSample(s);
 					}
 					else
 					{
 						PaintPane.Mac.get(foundAt).addSample(s);
 						s.addMac(PaintPane.Mac.get(foundAt));
+						PaintPane.mySamples.get(mySampleIndex).addSample(s);
 					}
 
 					MACAdd = "" ;
@@ -104,12 +110,14 @@ public class Parser {
 			if (!found)
 			{
 				PaintPane.Mac.add(new MAC_samples(essid, MACAdd.trim(), channel, s));
-				s.addMac(PaintPane.Mac.get(PaintPane.Mac.size()));
+				s.addMac(PaintPane.Mac.get(PaintPane.Mac.size()-1));
+				PaintPane.mySamples.get(mySampleIndex).addSample(s);
 			}
 			else
 			{
 				PaintPane.Mac.get(foundAt).addSample(s);
 				s.addMac(PaintPane.Mac.get(foundAt));
+				PaintPane.mySamples.get(mySampleIndex).addSample(s);
 			}
 
 		} catch (FileNotFoundException k) {
@@ -126,7 +134,7 @@ public class Parser {
 				max = sigL.get(i);
 		}
 //		PaintPane.mySamples.add(new sample(max, e.getX(), e.getY()));
-		System.out.println("mysample.size()" + PaintPane.mySamples.size());
+		System.out.println("mysample.size() " + PaintPane.mySamples.size());
 		
 		
 		/*
