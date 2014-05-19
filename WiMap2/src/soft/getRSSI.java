@@ -205,7 +205,7 @@ public class getRSSI {
 		InputStream inputStream = shellProcess.getInputStream(); 
 		int consoleDisplay;
 		while((consoleDisplay=inputStream.read())!=-1) {
-			System.out.println(consoleDisplay);
+			//System.out.println(consoleDisplay);
 		}
 		try {
 			inputStream.close();

@@ -421,7 +421,9 @@ public class PaintPane extends JComponent {
 			{
 				//value = (int)(mySamples.get(i).getSignal()) * -1;		//the strength of the red from the signal level
 				value = (int) (mySamples.get(i).getRSSI()*-1); //getNextValue() * -1);
-				myColor = getColor (value*-1);
+				//System.out.println("VAL: " + value);
+				//mySamples.get(i).printXYRSSI();
+				myColor = getColor (value);
 				g.setColor(myColor); 
 				g.fillRect(mySamples.get(i).getX()-(rectLength/2), mySamples.get(i).getY()-(rectLength/2), rectLength, rectLength);		//
 			}		

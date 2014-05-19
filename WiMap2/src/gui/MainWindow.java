@@ -284,7 +284,7 @@ public class MainWindow extends JPanel {
 
 	public static void aboutActionPerformed (ActionEvent event)
 	{
-		JOptionPane.showMessageDialog(f, "WiMAP ver2.0\n© Copyright, Jordan University of Science and Technology 2013.\n"
+		JOptionPane.showMessageDialog(f, "WiMAP ver2.0\nï¿½ Copyright, Jordan University of Science and Technology 2013.\n"
 				+ "All rights reserved.\nNetwork Engineering and Security Department\n- Bayan Taani\n- Wala'a Adel\n"
 				+ "- Deema Qusai", "About WiMAP", 3);
 	}
@@ -420,7 +420,7 @@ public class MainWindow extends JPanel {
 		sidePanel.setEnabled(true);
 		sidePanel.setVisible(true);
 
-		sidePanel.setPreferredSize(new Dimension(220, 1000));
+		sidePanel.setPreferredSize(new Dimension(220, 2000));
 
 		sidesp1 = new JScrollPane(sidePanel);
 		sidesp1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);

@@ -27,6 +27,7 @@ public class XY_sample {
 		X = x;
 		Y = y;
 		sampleList = new ArrayList<sample>();
+		MaxRSSI = -1000000000000000f;
 	}
 	
 	public void addSample (sample s)

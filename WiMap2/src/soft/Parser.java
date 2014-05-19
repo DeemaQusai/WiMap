@@ -134,7 +134,7 @@ public class Parser {
 				max = sigL.get(i);
 		}
 //		PaintPane.mySamples.add(new sample(max, e.getX(), e.getY()));
-		System.out.println("mysample.size() " + PaintPane.mySamples.size());
+		//System.out.println("mysample.size() " + PaintPane.mySamples.size());
 		
 		
 		/*

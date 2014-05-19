@@ -138,7 +138,7 @@ public class SaveOptions extends JDialog {
 								if (flag)
 									saveImagePath = saveImagePath + '.' + exts[0];
 							}
-							System.out.println("SAVING IMAGE");
+							//System.out.println("SAVING IMAGE");
 							BufferedImage saving = new BufferedImage(bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
 							Graphics graphics = saving.createGraphics();
 							p.paint(graphics);
@@ -150,7 +150,7 @@ public class SaveOptions extends JDialog {
 							{
 								File f = new File (file.getParent() + "/Data/");
 								f.getParentFile().mkdir();
-								System.out.println(file.getParent() + "/Data/");
+								//System.out.println(file.getParent() + "/Data/");
 								PaintPane.saveMacSamples(file.getParent() + "/Data/");	//save the data								
 							}
 						}
