@@ -1,12 +1,12 @@
 package soft;
 
 import java.util.Comparator;
-import java.util.Random;
 
 public class sample implements Comparator<sample> {
 	private float signal ;
 	private int x;
 	private int y;
+	private MAC_samples myMac;
 	//	private Boolean isAP;
 
 	public sample()
@@ -16,6 +16,14 @@ public class sample implements Comparator<sample> {
 		y = 0 ;
 	}
 
+	public sample(float s, int newx, int newy, MAC_samples mac)
+	{
+		signal = s;
+		x = newx ;
+		y = newy ;
+		myMac = mac;
+	}
+	
 	public sample(float s, int newx, int newy)
 	{
 		signal = s;
@@ -23,6 +31,16 @@ public class sample implements Comparator<sample> {
 		y = newy ;
 	}
 	
+	public void addMac(MAC_samples mac)
+	{
+		myMac = mac;
+	}
+	
+	public boolean toPaint ()
+	{
+		return myMac.isRepresented();
+	}
+/*
 	// just in case
 	public sample(int newx, int newy)
 	{
@@ -57,7 +75,7 @@ public class sample implements Comparator<sample> {
 		
 		return (float) RSSI;
 	}
- 
+*/ 
 	public float getSignal()
 	{
 		return signal ;
@@ -104,7 +122,7 @@ public class sample implements Comparator<sample> {
 	
 	public String toString ()
 	{
-		String temp =Float.toString(signal)+","+x+","+y ; 
+		String temp =x+","+y + ":" +Float.toString(signal); 
 		return temp;
 	}
 

@@ -25,7 +25,7 @@ import soft.*;
 public class PaintPane extends JComponent {
 
 	private static final long serialVersionUID = 1L;
-	public static ArrayList<sample> mySamples = null;
+	public static ArrayList<XY_sample> mySamples = null;
 	static ArrayList<JLabel> myLabels = null;
 	public static ArrayList <MAC_samples> Mac = new ArrayList<MAC_samples>();
 
@@ -55,7 +55,6 @@ public class PaintPane extends JComponent {
 	private int virtual_Ap =0;   //set to 1 if we will use virtual AP
 	private float P_d0;
 	private double d0;
-	private int MySamples =0;
 	private double Sigma =0;
 	
 	public static Boolean AP_here = false;
@@ -78,7 +77,7 @@ public class PaintPane extends JComponent {
 
 	public PaintPane ()
 	{
-		mySamples = new ArrayList<sample>();
+		mySamples = new ArrayList<XY_sample>();
 		myLabels = new ArrayList<JLabel>();
 		setLayout(null);
 		try
@@ -184,7 +183,7 @@ public class PaintPane extends JComponent {
 				{
 					Distance = distance (e.getX() , e.getY() , Mac.get(i).getApX() , Mac.get(i).getApY());
 					RSSI = (float)(	P_d0 - (10* PLE_n * Math.log10(Distance/ d0)) * Find_Gaussian());
-					sample s = new sample (RSSI ,e.getX() , e.getY());
+					sample s = new sample (RSSI ,e.getX() , e.getY(), Mac.get(i));
 					Mac.get(i).addSample(s);
 
 				}
@@ -358,10 +357,10 @@ public class PaintPane extends JComponent {
 						d = 0;
 						//starti = 0;
 						for (int j = 0 ; j<mySamples.size() ; j++){ // = starti){
-							d = distance(x, y, (int)mySamples.get(j).getX(), (int)mySamples.get(j).getY());
+							d = distance(x, y, mySamples.get(j).getX(), mySamples.get(j).getY());
 							if(x < mySamples.get(j).getX() && mySamples.get(j).getX() < x+l && y < mySamples.get(j).getY() && mySamples.get(j).getY() <y+l)
 							{
-								value = (int) Math.abs(mySamples.get(j).getSignal());// getNextValue());
+								value = (int) Math.abs(mySamples.get(j).getRSSI());// getNextValue());
 								//	System.out.println("value(" + x + "," + y + ") = " + value);
 
 								myColor = getColor (value);
@@ -378,9 +377,9 @@ public class PaintPane extends JComponent {
 						//starti = 0;
 						for(int i = 0 ; i<mySamples.size(); i++)// = starti)
 						{
-							dx = distance(x, y, (int)mySamples.get(i).getX(), (int)mySamples.get(i).getY()); 
+							dx = distance(x, y, mySamples.get(i).getX(), mySamples.get(i).getY()); 
 							wi = 1 / Math.pow(dx, p) ;
-							value = (int) (value + ((wi * (Math.abs(mySamples.get(i).getSignal())))/wj));  //getNextValue()
+							value = (int) (value + ((wi * (Math.abs(mySamples.get(i).getRSSI())))/wj));  //getNextValue()
 						}
 
 						myColor = getColor (value);
@@ -420,8 +419,8 @@ public class PaintPane extends JComponent {
 			for (int i = 0; i < mySamples.size() ; i++)// = starti)
 			{
 				//value = (int)(mySamples.get(i).getSignal()) * -1;		//the strength of the red from the signal level
-				value = (int) (mySamples.get(i).getSignal()*-1); //getNextValue() * -1);
-				myColor = getColor (value);
+				value = (int) (mySamples.get(i).getRSSI()*-1); //getNextValue() * -1);
+				myColor = getColor (value*-1);
 				g.setColor(myColor); 
 				g.fillRect(mySamples.get(i).getX()-(rectLength/2), mySamples.get(i).getY()-(rectLength/2), rectLength, rectLength);		//
 			}		
@@ -1049,8 +1048,19 @@ public class PaintPane extends JComponent {
 				{
 					line = scanner.nextLine();
 					temp = line.split(",");
-					sample s = new sample(Float.parseFloat(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
-					mySamples.add(s);
+					sample s = new sample(Float.parseFloat(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]), Mac.get(i));
+					int k ;
+					for (k = 0; k < mySamples.size() ; k++)
+					{
+						if (mySamples.get(k).getX() == s.getX() && mySamples.get(k).getY() == s.getY())
+						{
+							mySamples.get(k).addSample(s);
+						}
+					}
+					if (k == mySamples.size())
+					{
+						mySamples.add(new XY_sample(s.getX(), s.getY(), s));
+					}
 					Mac.get(i).addSample(s);
 				}
 
@@ -1069,6 +1079,11 @@ public class PaintPane extends JComponent {
 		sampleCount.setText("Number of samples: " + Integer.toString(mySamples.size()));
 		repaint();
 
+		
+		for (int i = 0; i < mySamples.size() ; i++)
+		{
+			mySamples.get(i).printXYRSSI();
+		}
 		/*
 		for (int i = 0 ; i < Mac.size(); i++)
 		{
@@ -1087,7 +1102,7 @@ public class PaintPane extends JComponent {
 		double X, Y , Result;
 		double min =0;
 		double J_n =0;
-		double sigma;
+		//double sigma;
 		int j=0;
 
 		ArrayList <Double> distance_M = new ArrayList<Double>();

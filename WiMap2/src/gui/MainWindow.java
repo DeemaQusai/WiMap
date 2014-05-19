@@ -445,7 +445,7 @@ public class MainWindow extends JPanel {
 
 		authAP_sp.setEnabled(true);
 		authAP_sp.setVisible(true);
-		authAP_sp.setPreferredSize(new Dimension(220, 1000));
+		authAP_sp.setPreferredSize(new Dimension(220, 2000));
 
 		sidesp2 = new JScrollPane(authAP_sp);
 		tb.addTab("AP list", sidesp2);

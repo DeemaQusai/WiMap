@@ -50,9 +50,15 @@ public class Parser {
 				if (S.contains("Cell ") && !S.contains("Cell 01"))
 				{
 					if (!found)
+					{
 						PaintPane.Mac.add(new MAC_samples(essid, MACAdd.trim(), channel, s));
+						s.addMac(PaintPane.Mac.get(PaintPane.Mac.size()));
+					}
 					else
+					{
 						PaintPane.Mac.get(foundAt).addSample(s);
+						s.addMac(PaintPane.Mac.get(foundAt));
+					}
 
 					MACAdd = "" ;
 					essid = "";
@@ -96,9 +102,15 @@ public class Parser {
 				
 			}
 			if (!found)
+			{
 				PaintPane.Mac.add(new MAC_samples(essid, MACAdd.trim(), channel, s));
+				s.addMac(PaintPane.Mac.get(PaintPane.Mac.size()));
+			}
 			else
+			{
 				PaintPane.Mac.get(foundAt).addSample(s);
+				s.addMac(PaintPane.Mac.get(foundAt));
+			}
 
 		} catch (FileNotFoundException k) {
 			k.printStackTrace();
@@ -113,7 +125,7 @@ public class Parser {
 			if (max < sigL.get(i))
 				max = sigL.get(i);
 		}
-		PaintPane.mySamples.add(new sample(max, e.getX(), e.getY()));
+//		PaintPane.mySamples.add(new sample(max, e.getX(), e.getY()));
 		System.out.println("mysample.size()" + PaintPane.mySamples.size());
 		
 		

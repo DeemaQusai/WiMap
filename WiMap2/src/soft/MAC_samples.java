@@ -110,12 +110,13 @@ public class MAC_samples
 	}
 	*/
 	
+	/*
 	public void addSample(float sig ,int x, int y)
 	{
 		//PaintPane.mySamples.add(new sample(sig, x, y));
 		sampleArr.add(new sample(sig, x, y));
 	}
-
+	*/
 	public void addSample(sample s)
 	{
 		//PaintPane.mySamples.add(s);
