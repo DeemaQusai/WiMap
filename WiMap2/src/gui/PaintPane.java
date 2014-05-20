@@ -312,12 +312,12 @@ public class PaintPane extends JComponent {
 		smoothBtn.setEnabled(true);
 		doneBtn.setEnabled(true);
 	}
-
+/*
 	public void repaintImage()
 	{
 		repaint();
 	}
-	
+*/	
 	public void paint (Graphics g)
 	{
 		MainWindow.updateAPList();
@@ -365,7 +365,7 @@ public class PaintPane extends JComponent {
 								value = (int) Math.abs(mySamples.get(j).getRSSI());// getNextValue());
 								//	System.out.println("value(" + x + "," + y + ") = " + value);
 
-								myColor = getColor (value);
+								myColor = getColor (Math.abs(value));
 
 								g.setColor(myColor); 
 								g.fillRect(x, y, l, l);		//
@@ -384,7 +384,7 @@ public class PaintPane extends JComponent {
 							value = (int) (value + ((wi * (Math.abs(mySamples.get(i).getRSSI())))/wj));  //getNextValue()
 						}
 
-						myColor = getColor (value);
+						myColor = getColor (Math.abs(value));
 						//System.out.println("value(" + x + "," + y + ") = " + value);
 						g.setColor(myColor); 
 						g.fillRect(x, y, l, l);		//
@@ -398,13 +398,13 @@ public class PaintPane extends JComponent {
 			for (int i = 0; i < mySamples.size() ; i++)// = starti)
 			{
 				//value = (int)(mySamples.get(i).getSignal()) * -1;		//the strength of the red from the signal level
-				value = (int) (mySamples.get(i).getRSSI()* -1); //getNextValue() * -1);
+				value = (int) (mySamples.get(i).getRSSI()); //getNextValue() * -1);
 				//System.out.println("VAL: " + value);
 				//mySamples.get(i).printXYRSSI();
-				myColor = getColor (value);
+				myColor = getColor (Math.abs(value));
 				g.setColor(myColor);
-				System.out.println(value);
-				if (value < 1000)
+				//System.out.println(value);
+				if (value > -1000)
 					g.fillRect(mySamples.get(i).getX()-(rectLength/2), mySamples.get(i).getY()-(rectLength/2), rectLength, rectLength);		//
 			}		
 			
@@ -523,12 +523,12 @@ public class PaintPane extends JComponent {
 	public void deleteSample (int index)
 	{
 		JLabel rmlabel = myLabels.get(index);
-		myLabels.remove(index);
-		remove(rmlabel);
 		for ( int i = 0; i < Mac.size() ; i++)
 		{
 			Mac.get(i).removeSample(mySamples.get(index).getX(), mySamples.get(index).getY());
 		}
+		myLabels.remove(index);
+		remove(rmlabel);
 		mySamples.remove(index);
 		sampleCount.setText("Number of samples: " + Integer.toString(mySamples.size()));
 
@@ -1049,14 +1049,16 @@ public class PaintPane extends JComponent {
 					temp = line.split(",");
 					sample s = new sample(Float.parseFloat(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]), Mac.get(i));
 					int k ;
+					boolean foundIt = false;
 					for (k = 0; k < mySamples.size() ; k++)
 					{
 						if (mySamples.get(k).getX() == s.getX() && mySamples.get(k).getY() == s.getY())
 						{
 							mySamples.get(k).addSample(s);
+							foundIt = true;
 						}
 					}
-					if (k == mySamples.size())
+					if (!foundIt && k == mySamples.size())
 					{
 						mySamples.add(new XY_sample(s.getX(), s.getY(), s));
 					}

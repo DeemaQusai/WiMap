@@ -421,7 +421,7 @@ public class MainWindow extends JPanel {
 		sidePanel.setEnabled(true);
 		sidePanel.setVisible(true);
 
-		sidePanel.setPreferredSize(new Dimension(220, 2000));
+		sidePanel.setPreferredSize(new Dimension(220, 4000));
 
 		sidesp1 = new JScrollPane(sidePanel);
 		sidesp1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -481,7 +481,7 @@ public class MainWindow extends JPanel {
 		authAP_sp.add(uncheckall);
 		authAP_sp.setEnabled(true);
 		authAP_sp.setVisible(true);
-		authAP_sp.setPreferredSize(new Dimension(220, 2000));
+		authAP_sp.setPreferredSize(new Dimension(220, 4000));
 
 		sidesp2 = new JScrollPane(authAP_sp);
 		tb.addTab("AP list", sidesp2);
@@ -517,7 +517,7 @@ public class MainWindow extends JPanel {
 					s = s[1].split("- ESSID");
 					PaintPane.Mac.get(Integer.parseInt(s[0])-1).setRepresented(  (e.getStateChange() == ItemEvent.SELECTED? true:false)  );
 					
-					
+					/*
 					if (PaintPane.Mac.get(Integer.parseInt(s[0])-1).isRepresented())
 						System.out.println("YES " + PaintPane.Mac.get(Integer.parseInt(s[0])-1).getMacAddress());
 					else if (!PaintPane.Mac.get(Integer.parseInt(s[0])-1).isRepresented())
@@ -581,6 +581,7 @@ public class MainWindow extends JPanel {
 							} else if(PromptResult==JOptionPane.YES_OPTION)
 							{////////////????????
 								save();   
+								System.exit(0);
 							}
 						}
 						else
