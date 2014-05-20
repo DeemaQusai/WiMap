@@ -343,6 +343,7 @@ public class MainWindow extends JPanel {
 
 		add(toolBar, BorderLayout.NORTH);
 
+		toolBar.add(panelCanvas.addMacCount());
 		toolBar.add(panelCanvas.addSamlpeCount());
 		toolBar.add(panelCanvas.addRefreshBtn());
 		toolBar.add(panelCanvas.addUndoBtn());		//add undo button to the tool bar
@@ -432,17 +433,52 @@ public class MainWindow extends JPanel {
 		authAP_sp.setBackground(new Color(windowColor));
 		authAP_sp.setName("SidePanel");
 		authAP_sp.setPreferredSize(new Dimension(240, f.getHeight()));
-
+/*
 		authAP_sp.add(new JButton("Refresh"){
 			private static final long serialVersionUID = 1L;
 			{
 				addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent event) {
+						for (int i = 0; i < chbxlist.size(); i++)
+						{
+								PaintPane.Mac.get(i).setRepresented(chbxlist.get(i).isSelected());
+						}
 						updateAPList();
 					}
 				});
 			}});
+*/
 
+		JButton checkAll = new JButton("check ALL"){
+			private static final long serialVersionUID = 1L;
+			{
+				addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent event) {
+						for (int i = 0; i < chbxlist.size(); i++)
+						{
+							chbxlist.get(i).setSelected(true);
+							PaintPane.Mac.get(i).setRepresented(true);
+						}
+					}
+				});
+			}};
+		
+		authAP_sp.add(checkAll);
+		JButton uncheckall = new JButton("uncheck ALL"){
+			private static final long serialVersionUID = 1L;
+			{
+				addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent event) {
+						for (int i = 0; i < chbxlist.size(); i++)
+						{
+							chbxlist.get(i).setSelected(false);
+							PaintPane.Mac.get(i).setRepresented(false);
+						}
+					}
+				});
+			}};
+			
+		authAP_sp.add(uncheckall);
 		authAP_sp.setEnabled(true);
 		authAP_sp.setVisible(true);
 		authAP_sp.setPreferredSize(new Dimension(220, 2000));
@@ -453,47 +489,60 @@ public class MainWindow extends JPanel {
 
 	public static void updateAPList ()
 	{
-		if (PaintPane.Mac.size() != 0)
+		for(int x = 0; x < chbxlist.size() ; x++)
 		{
-			authAP_sp.removeAll();
-			chbxlist.clear();
+			String [] parse = chbxlist.get(x).getText().split("Sample Count: " );
+			chbxlist.get(x).setText(parse[0] + "Sample Count: " + PaintPane.Mac.get(x).getSampleCount() + "<br>" +
+					"</html>");
 		}
-		for(int x = 0; x < PaintPane.Mac.size(); x++)
+		for(int x = chbxlist.size(); x < PaintPane.Mac.size(); x++)
 		{
-			JPanel tempPanel = new JPanel();
-			tempPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-			tempPanel.setPreferredSize(new Dimension(sidePanel.getWidth(), 105));
-			tempPanel.validate();
-			tempPanel.repaint();
 
-			chbxlist.add(new JCheckBox());
-
-			tempPanel.add(chbxlist.get(chbxlist.size()-1));
-			//tempPanel.add(Box.createRigidArea(new Dimension(chbxlist.get(0).getWidth(), chbxlist.get(0).getHeight())));
-			//		JLabel tempL = new JLabel("ESSID: " + PaintPane.Mac.get(x).getESSID());
-
-			String panelContents = "<html>" + "ESSID: " + PaintPane.Mac.get(x).getESSID() + "<br>" +
+			String panelContents = "<html>" + (x+1) + "- ESSID: " + PaintPane.Mac.get(x).getESSID() + "<br>" +
 					"MAC: " + PaintPane.Mac.get(x).getMacAddress() + "<br>" +
 					"Channel: " + PaintPane.Mac.get(x).getChannel() + "<br>" +
 					"Position: (" + PaintPane.Mac.get(x).getApX() + "," + PaintPane.Mac.get(x).getApY() + ")" + "<br>" +
 					"Sample Count: " + PaintPane.Mac.get(x).getSampleCount() + "<br>" +
 					"</html>";
+			
+			chbxlist.add(new JCheckBox(panelContents, PaintPane.Mac.get(x).isRepresented()));
 
-			tempPanel.add(new JLabel(panelContents));
+			chbxlist.get(x).setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 
-			/*tempPanel.add(tempL);
-			tempPanel.add(new JLabel("MAC: " + PaintPane.Mac.get(x).getMacAddress()));
-			tempPanel.add(new JLabel("Channel: " + PaintPane.Mac.get(x).getChannel()));
-			tempPanel.add(new JLabel("Position: (" + PaintPane.Mac.get(x).getApX() + "," + PaintPane.Mac.get(x).getApY() + ")"));
-			tempPanel.add(new JLabel("Sample Count: " + PaintPane.Mac.get(x).getSampleCount()));
-			 */
-			authAP_sp.add(tempPanel);
+			chbxlist.get(x).addItemListener(new ItemListener() {
+				public void itemStateChanged(ItemEvent e) {
+
+					JCheckBox ch = (JCheckBox) e.getSource();
+					String [] s = ch.getText().split("<html>");
+					s = s[1].split("- ESSID");
+					PaintPane.Mac.get(Integer.parseInt(s[0])-1).setRepresented(  (e.getStateChange() == ItemEvent.SELECTED? true:false)  );
+					
+					
+					if (PaintPane.Mac.get(Integer.parseInt(s[0])-1).isRepresented())
+						System.out.println("YES " + PaintPane.Mac.get(Integer.parseInt(s[0])-1).getMacAddress());
+					else if (!PaintPane.Mac.get(Integer.parseInt(s[0])-1).isRepresented())
+						System.out.println("NO " + PaintPane.Mac.get(Integer.parseInt(s[0])-1).getMacAddress());
+/*					for (int i = 0 ; i < PaintPane.mySamples.size(); i++)
+					{
+						PaintPane.mySamples.get(i).changeMaxRSSI();
+					}
+*/
+				}
+			});
+			authAP_sp.add(chbxlist.get(x));
 			authAP_sp.validate();
 			authAP_sp.repaint();
 		}
-
-
 	}
+	
+/*	public void itemStateChange (ItemEvent e, int i)
+	{
+		if (e.getStateChange() == ItemEvent.DESELECTED)
+			PaintPane.Mac.get(i).setRepresented(false);
+		else if (e.getStateChange() == ItemEvent.SELECTED)
+			PaintPane.Mac.get(i).setRepresented(true);
+	}
+	*/
 	public MainWindow() {
 		panelCanvas = new PaintPane() ;
 
@@ -521,15 +570,21 @@ public class MainWindow extends JPanel {
 					@Override
 					public void windowClosing(WindowEvent we)
 					{ 
-						String ObjButtons[] = {"Save","Discard"};
-						int PromptResult = JOptionPane.showOptionDialog(null,"Save before exit?","",JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null,ObjButtons,ObjButtons[1]);
-						if(PromptResult==JOptionPane.NO_OPTION)
-						{
-							System.exit(0);
-						} else if(PromptResult==JOptionPane.YES_OPTION)
-						{////////////????????
-							save();   
+
+						String ObjButtons[] = {"Yes","No","Cancel"};
+						if (PaintPane.Mac.size() != 0)
+						{	
+							int PromptResult = JOptionPane.showOptionDialog(null,"Save before exit?","",JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null,ObjButtons,ObjButtons[1]);
+							if(PromptResult==JOptionPane.NO_OPTION)
+							{
+								System.exit(0);
+							} else if(PromptResult==JOptionPane.YES_OPTION)
+							{////////////????????
+								save();   
+							}
 						}
+						else
+							System.exit(0);
 					}
 				});
 				f.setVisible(true);

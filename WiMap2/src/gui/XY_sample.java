@@ -65,17 +65,17 @@ public class XY_sample {
 	
 	public void changeMaxRSSI()
 	{
-		MaxRSSI = sampleList.get(0).getSignal();
-		for (int i = 1; i < sampleList.size(); i++)
+		MaxRSSI = -1000000;
+		for (int i = 0; i < sampleList.size(); i++)
 		{
 			try
 			{
-			if (sampleList.get(i).toPaint())
-				Math.max(MaxRSSI, sampleList.get(i).getSignal());
+				if (sampleList.get(i).toPaint())
+					MaxRSSI = Math.max(MaxRSSI, sampleList.get(i).getSignal());
 			}
 			catch (NullPointerException e)
 			{
-				System.out.println("XY_sample.changeMaxRSSI()");
+				System.out.println("WAAAAA XY_sample.changeMaxRSSI()");
 				// remove sample from list
 			}
 		}

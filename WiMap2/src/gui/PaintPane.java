@@ -42,6 +42,7 @@ public class PaintPane extends JComponent {
 	private JButton doneBtn;
 	private JButton refreshBtn;
 	private JTextField sampleCount ;
+	private JTextField MacCount;
 
 	private int l = DEFAULT_RES ;
 	private int rectLength = 15;		// for smoothing off
@@ -151,6 +152,7 @@ public class PaintPane extends JComponent {
 				refreshBtn.setEnabled(true);
 				smoothBtn.setEnabled(true);
 				sampleCount.setText("Number of samples: " + Integer.toString(mySamples.size()));
+				MacCount.setText("Number of AP's: " + Integer.toString(Mac.size()));
 				repaint();
 				System.out.println("Mac.size()" + Mac.size());
 			}
@@ -396,12 +398,14 @@ public class PaintPane extends JComponent {
 			for (int i = 0; i < mySamples.size() ; i++)// = starti)
 			{
 				//value = (int)(mySamples.get(i).getSignal()) * -1;		//the strength of the red from the signal level
-				value = (int) (mySamples.get(i).getRSSI()*-1); //getNextValue() * -1);
+				value = (int) (mySamples.get(i).getRSSI()* -1); //getNextValue() * -1);
 				//System.out.println("VAL: " + value);
 				//mySamples.get(i).printXYRSSI();
 				myColor = getColor (value);
-				g.setColor(myColor); 
-				g.fillRect(mySamples.get(i).getX()-(rectLength/2), mySamples.get(i).getY()-(rectLength/2), rectLength, rectLength);		//
+				g.setColor(myColor);
+				System.out.println(value);
+				if (value < 1000)
+					g.fillRect(mySamples.get(i).getX()-(rectLength/2), mySamples.get(i).getY()-(rectLength/2), rectLength, rectLength);		//
 			}		
 			
 		}
@@ -410,7 +414,7 @@ public class PaintPane extends JComponent {
 			if (Mac.get(i).isLocated())
 				g.drawImage(APIcon, Mac.get(i).getApX()-(APIcon.getWidth()/2), Mac.get(i).getApY()-(APIcon.getHeight()), null);
 		}
-
+		smoothOn = false;
 	}
 
 	public double distance (int x2, int y2, int x1, int y1)
@@ -483,12 +487,21 @@ public class PaintPane extends JComponent {
 	public JTextField addSamlpeCount()
 	{
 		sampleCount = new JTextField("Number of samples: " + Integer.toString(mySamples.size()));
-		sampleCount.setSize(WIDTH, HEIGHT);
+		sampleCount.setSize(20, HEIGHT);
 		sampleCount.setEditable(false);
-		sampleCount.setHorizontalAlignment(JTextField.LEFT);
+		//sampleCount.setHorizontalAlignment(JTextField.LEFT);
 		return sampleCount;
 	}
 
+	public JTextField addMacCount()
+	{
+		MacCount = new JTextField("Number of AP's: " + Integer.toString(Mac.size()));
+		MacCount.setSize(20, HEIGHT);
+		MacCount.setEditable(false);
+		//MacCount.setHorizontalAlignment(JTextField.LEFT);
+		return MacCount;
+	}
+	
 	//delete sample by right clicking on it
 	public void deleteSample (JLabel label)
 	{
@@ -496,6 +509,10 @@ public class PaintPane extends JComponent {
 		JLabel rmlabel = myLabels.get(index);
 		myLabels.remove(label);
 		remove(rmlabel);
+		for ( int i = 0; i < Mac.size() ; i++)
+		{
+			Mac.get(i).removeSample(mySamples.get(index).getX(), mySamples.get(index).getY());
+		}
 		mySamples.remove(index);
 		sampleCount.setText("Number of samples: " + Integer.toString(mySamples.size()));
 
@@ -505,10 +522,14 @@ public class PaintPane extends JComponent {
 	//delete sample by index -> used in the undo button 
 	public void deleteSample (int index)
 	{
-		JLabel rmlabel = myLabels.get(index-1);
-		myLabels.remove(index-1);
+		JLabel rmlabel = myLabels.get(index);
+		myLabels.remove(index);
 		remove(rmlabel);
-		mySamples.remove(index-1);
+		for ( int i = 0; i < Mac.size() ; i++)
+		{
+			Mac.get(i).removeSample(mySamples.get(index).getX(), mySamples.get(index).getY());
+		}
+		mySamples.remove(index);
 		sampleCount.setText("Number of samples: " + Integer.toString(mySamples.size()));
 
 		repaint();
@@ -541,7 +562,6 @@ public class PaintPane extends JComponent {
 		undoBtn.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0){
 				undo();
-				sampleCount.setText("Number of samples: " + Integer.toString(mySamples.size()));
 			}
 		});
 		undoBtn.setEnabled(false);
@@ -551,7 +571,7 @@ public class PaintPane extends JComponent {
 	{
 		if (!mySamples.isEmpty())
 		{
-			deleteSample(myLabels.size());
+			deleteSample(myLabels.size()-1);
 		}
 		if (mySamples.isEmpty())
 		{
@@ -586,6 +606,9 @@ public class PaintPane extends JComponent {
 			mySamples.clear();
 			myLabels.clear();
 			removeAll();			//removes all components
+			for (MAC_samples ap : Mac) {
+				ap.clear();
+			}
 			undoBtn.setEnabled(false);
 			clearBtn.setEnabled(false);
 			smoothBtn.setEnabled(false);
@@ -602,7 +625,7 @@ public class PaintPane extends JComponent {
 		refreshIcon = new ImageIcon(newimg); 
 
 		refreshBtn = new JButton(refreshIcon);
-		refreshBtn.setToolTipText("Clear all data");
+		refreshBtn.setToolTipText("refresh map");
 		refreshBtn.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0){
 				refresh();
@@ -613,15 +636,17 @@ public class PaintPane extends JComponent {
 	}
 	public void refresh()
 	{
+		for (int i = 0; i < mySamples.size(); i++)
+			mySamples.get(i).changeMaxRSSI();
 		repaint();
-		// HERE REFILL MYSAMPLES
 	}
+
 	public JButton addSmoothBtn()
 	{
 		smoothBtn = new JButton("Smooth: On");
 		smoothBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(smoothOn)
+/*				if(smoothOn)
 				{	// if smooth button was on turn it off
 					smoothOn = false;
 					smoothBtn.setText("Smooth: On");
@@ -631,7 +656,9 @@ public class PaintPane extends JComponent {
 					smoothBtn.setText("Smooth: Off");
 					smoothOn = true;
 				}
+*/				smoothOn = true;
 				repaint();
+
 			}
 		});
 		smoothBtn.setEnabled(false);
@@ -724,11 +751,11 @@ public class PaintPane extends JComponent {
 		}
 	}
 	
+	/**
+	 * Given a MAC address in string format, return the corresponding entry in the Mac list
+	 */
 	public static MAC_samples getEntryFromMACArray(String mac)
 	{
-		/*
-		 * Given a MAC address in string format, return the corresponding entry in the Mac list
-		 */
 		
 		for (int i = 0; i < PaintPane.Mac.size(); i++)
 		{
@@ -975,11 +1002,13 @@ public class PaintPane extends JComponent {
 
 				line = scanner.nextLine();		//	AP position
 				temp = line.split("," ,4);
+				boolean located = false;
 				int x = 0,y = 0;
 				try
 				{
-				x = Integer.parseInt(temp[1]);
-				y = Integer.parseInt(temp[2]);
+					x = Integer.parseInt(temp[1]);
+					y = Integer.parseInt(temp[2]);
+					located = true;
 				}
 				catch(NumberFormatException nfe)
 				{}
@@ -1002,10 +1031,16 @@ public class PaintPane extends JComponent {
 						Mac.get(i).setAuthorized(auth);
 						// MUST DO MORE STUFF HERE??
 						break;
+		
 					}
 				}
 				if(Mac.isEmpty() || !found)
-					Mac.add(new MAC_samples(essid, macAdd, chnl, auth, x,y));
+				{
+					if (located)
+						Mac.add(new MAC_samples(essid, macAdd, chnl, auth, x,y));
+					else
+						Mac.add(new MAC_samples(essid, macAdd, chnl, auth));
+				}
 
 				scanner.nextLine();		//skip the header of the file
 				while (scanner.hasNextLine()) 
@@ -1040,6 +1075,7 @@ public class PaintPane extends JComponent {
 		clearBtn.setEnabled(true);
 		smoothBtn.setEnabled(true);
 		refreshBtn.setEnabled(true);
+		MacCount.setText("Number of AP's: " + Integer.toString(Mac.size()));
 		sampleCount.setText("Number of samples: " + Integer.toString(mySamples.size()));
 		repaint();
 
@@ -1098,7 +1134,6 @@ public class PaintPane extends JComponent {
 
 		d0 = min;
 		P_d0 = Mac.get(Max_index).getS_RSSI(j);
-
 
 		//Calculate J(n) to Find sigmaa
 		for (int n =0 ; n < distance_M.size() ; n++)

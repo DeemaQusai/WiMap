@@ -138,8 +138,14 @@ public class MAC_samples
 		isRepresented = b ;
 	}
 
-	
-	/*
+	/**
+	 * Clears the sample in the array
+	 */
+	public void clear()
+	{
+		sampleArr.clear();
+	}
+	/**
 	 * I did these to keep the sampleArr private
 	 */
 	public int getS_X(int index)
@@ -159,6 +165,24 @@ public class MAC_samples
 		return sampleArr.size();
 	}
 	
+	/**
+	 * removes the sample in the array at these coordinates
+	 * @param x
+	 * @param y
+	 */
+	public void removeSample(int x, int y)
+	{
+		// started from the end because it's faster for undo
+		for(int i = sampleArr.size()-1 ; i >= 0; i--)
+		{
+			if (sampleArr.get(i).getX() == x && sampleArr.get(i).getY() == y)
+			{
+				sampleArr.remove(i);
+				break;
+			}
+		}
+	}
+	
 	public String printSig_X_Y(int index)
 	{
 		String ret = Float.toString(sampleArr.get(index).getSignal())+"," + sampleArr.get(index).getX()+","+sampleArr.get(index).getY();
@@ -167,7 +191,10 @@ public class MAC_samples
 	
 	public String printAP_X_Y()
 	{
-		return X+","+Y;
+		if (isLocated)
+			return X+","+Y;
+		else
+			return "null,null";
 	}
 	
 	public void setMacAddress(String mac_add)
@@ -183,23 +210,23 @@ public class MAC_samples
 		channel = ch;
 	}
 
-	/*
-	 * returns the Mac address as String in the default form: 6 2Hexadicimal digits separated by ":"
-	 */
-	
 	public void setLocation(int x, int y)
 	{
 		X = x;
 		Y = y;
+		isLocated = true;
 	}
 	
+	/**
+	 * returns the Mac address as String in the default form: 6 2 Hexadicimal digits separated by ":"
+	 */
 	public String getMacAddress()
 	{
 		return MacAddress;
 	}
 
-	/*
-	 * returns the Mac address as String in the default form: 6 2Hexadicimal digits separated by "-"
+	/**
+	 * returns the Mac address as String in the default form: 6 2 Hexadicimal digits separated by "-"
 	 */
 	public String getMac_Address()
 	{
